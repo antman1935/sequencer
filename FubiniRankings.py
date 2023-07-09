@@ -161,8 +161,17 @@ def test_t_generator():
     cmd = FubiniGeneratorCmd(param_str)
     return Command.generator_test(f"Running Fubini generator test ({param_str})", cmd, expected_values)
 
+def nis0_generator_test():
+    param_str = "n:0"
+    expected_values = [
+        [],
+    ]
+
+    cmd = FubiniGeneratorCmd(param_str)
+    return Command.generator_test(f"Running Fubini generator test ({param_str})", cmd, expected_values)
+
 def tests():
-    test_funcs = [base_generator_test, test_k_generator, test_t_generator]
+    test_funcs = [base_generator_test, test_k_generator, test_t_generator, nis0_generator_test]
     print(f"Running {len(test_funcs)} tests for Fubini Generator.")
     success = sum([func() for func in test_funcs])
     print(f"{success}/{len(test_funcs)} tests passed.")
