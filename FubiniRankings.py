@@ -16,7 +16,7 @@ those parameters.
 class FubiniGeneratorCmd(Command):
     parameters: list[CommandParameter] = [
         CommandParameter("n", True, ParamType.NATURAL, "The number of positions to give a rank."),
-        CommandParameter("k", False, ParamType.NATURAL, "The maximum number of positions in an individual tie."),
+        CommandParameter("k", False, ParamType.INT_POS, "The maximum number of positions in an individual tie."),
         CommandParameter("t", False, ParamType.NATURAL, "The maximum number of ties."),
     ]
     parser: CommandParser = CommandParser(parameters)
