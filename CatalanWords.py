@@ -86,7 +86,7 @@ def base_generator_test():
     ]
 
     cmd = CatalanGeneratorCmd(param_str)
-    return Command.generator_test(f"Running Catalan generator test ({param_str})", cmd, expected_values)
+    return Command.generator_test(f"Running Catalan generator test ({param_str})", cmd.generator(), expected_values)
 
 def base_generator_test2():
     param_str = "n:4"
@@ -108,7 +108,7 @@ def base_generator_test2():
     ]
 
     cmd = CatalanGeneratorCmd(param_str)
-    return Command.generator_test(f"Running Catalan generator test ({param_str})", cmd, expected_values)
+    return Command.generator_test(f"Running Catalan generator test ({param_str})", cmd.generator(), expected_values)
 
 def nis0_generator_test():
     param_str = "n:0"
@@ -117,7 +117,7 @@ def nis0_generator_test():
     ]
 
     cmd = CatalanGeneratorCmd(param_str)
-    return Command.generator_test(f"Running Catalan generator test ({param_str})", cmd, expected_values)
+    return Command.generator_test(f"Running Catalan generator test ({param_str})", cmd.generator(), expected_values)
 
 def tests():
     test_funcs = [base_generator_test, base_generator_test2, nis0_generator_test]

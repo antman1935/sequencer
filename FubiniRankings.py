@@ -125,7 +125,7 @@ def base_generator_test():
     ]
 
     cmd = FubiniGeneratorCmd(param_str)
-    return Command.generator_test(f"Running Fubini generator test ({param_str})", cmd, expected_values)
+    return Command.generator_test(f"Running Fubini generator test ({param_str})", cmd.generator(), expected_values)
 
 def test_k_generator():
     param_str = "n:3|k:2"
@@ -145,7 +145,7 @@ def test_k_generator():
     ]
 
     cmd = FubiniGeneratorCmd(param_str)
-    return Command.generator_test(f"Running Fubini generator test ({param_str})", cmd, expected_values)
+    return Command.generator_test(f"Running Fubini generator test ({param_str})", cmd.generator(), expected_values)
 
 def test_t_generator():
     param_str = "n:3|k:3|t:0"
@@ -159,7 +159,7 @@ def test_t_generator():
     ]
 
     cmd = FubiniGeneratorCmd(param_str)
-    return Command.generator_test(f"Running Fubini generator test ({param_str})", cmd, expected_values)
+    return Command.generator_test(f"Running Fubini generator test ({param_str})", cmd.generator(), expected_values)
 
 def nis0_generator_test():
     param_str = "n:0"
@@ -168,7 +168,7 @@ def nis0_generator_test():
     ]
 
     cmd = FubiniGeneratorCmd(param_str)
-    return Command.generator_test(f"Running Fubini generator test ({param_str})", cmd, expected_values)
+    return Command.generator_test(f"Running Fubini generator test ({param_str})", cmd.generator(), expected_values)
 
 def tests():
     test_funcs = [base_generator_test, test_k_generator, test_t_generator, nis0_generator_test]

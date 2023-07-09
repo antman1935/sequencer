@@ -86,18 +86,21 @@ be overriden by all the subclasses.
 class Command:
     def generator(self):
         raise Exception("unimplemented")
+    
+    def flat_generator(self):
+        return None
 
     """
     Convienence function for testing generator output. Given a command that generates words, check that
     its output matches the list. Gives delta from both list if there is a miss-match.
     """
-    def generator_test(name: str, cmd, expected_list):
+    def generator_test(name: str, generator, expected_list):
         print(name)
         cmd_m_expected_list = []
         expected_list_m_cmd = []
 
         temp = []
-        for word in cmd.generator():
+        for word in generator:
             if not word in expected_list:
                 cmd_m_expected_list.append(word)
             else:
