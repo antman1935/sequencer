@@ -106,8 +106,6 @@ def getRanksInTies(ranking: list[int]):
 #                                                                   #
 #####################################################################
 
-from CmdTools import generator_test
-
 def base_generator_test():
     param_str = "n:3"
     expected_values = [

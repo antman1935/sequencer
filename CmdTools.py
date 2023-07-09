@@ -15,7 +15,7 @@ class ParamType(StrEnum):
     This function validates the parameter based on the ParamType and returns the valid
     data in the correct datatype.
     """
-    def validateAndConvertParameter(param_type: ParamType, value):
+    def validateAndConvertParameter(param_type, value):
         match param_type:
             case ParamType.NATURAL:
                 # ℕ, value must be integer and >= 0
@@ -33,7 +33,7 @@ class ParamType(StrEnum):
             case _:
                 raise Exception("Unsupported parameter type:", param_type)
 
-ParamType.validateAndConvertParameterValue = staticmethod(ParamType.validateAndConvertParameterValue)
+ParamType.validateAndConvertParameterValue = staticmethod(ParamType.validateAndConvertParameter)
 
 """
 A command defines the list of the parameters that can be passed to it, and which ones are required.
@@ -91,7 +91,7 @@ class Command:
     Convienence function for testing generator output. Given a command that generates words, check that
     its output matches the list. Gives delta from both list if there is a miss-match.
     """
-    def generator_test(name: str, cmd: Command, expected_list):
+    def generator_test(name: str, cmd, expected_list):
         print(name)
         cmd_m_expected_list = []
         expected_list_m_cmd = []
@@ -114,4 +114,4 @@ class Command:
         print("Success!")
         return True
 
-Command.generator_test = static_method(Command.generator_test)
+Command.generator_test = staticmethod(Command.generator_test)
