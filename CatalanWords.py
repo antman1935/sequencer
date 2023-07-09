@@ -53,7 +53,7 @@ def generateCatalanWords(options: CatalanGeneratorOptions):
     
     def helper(current_word):
         if len(current_word) == options.n:
-            yield current_word + []
+            yield current_word[:]
             return
         prev = options.n if len(current_word) == 0 else current_word[-1]
         prev = min(options.n, prev + 2)
