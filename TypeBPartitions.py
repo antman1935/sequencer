@@ -14,6 +14,8 @@ parameters for this generator and gives access to the generator with
 those parameters.
 """
 class TypeBPartitionGeneratorCmd(Command):
+    name: str = "type_b"
+    description: str = "Type B Partitions"
     parameters: list[CommandParameter] = [
         CommandParameter("n", True, ParamType.NATURAL, "The length of the string"),
     ]
@@ -27,6 +29,10 @@ class TypeBPartitionGeneratorCmd(Command):
     def generator(self):
         for word in generateTypeBPartitions(self.options):
             yield word
+
+    def __str__(self):
+        params = {"n": self.options.n}
+        return f"TypeBPartitions({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
         
 
 """

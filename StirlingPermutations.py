@@ -14,6 +14,8 @@ parameters for this generator and gives access to the generator with
 those parameters.
 """
 class StirlingGeneratorCmd(Command):
+    name: str = "stirling"
+    description: str = "Stirling Permutations"
     parameters: list[CommandParameter] = [
         CommandParameter("n", True, ParamType.NATURAL, "The number of positions to give a rank."),
         CommandParameter("k", False, ParamType.INT_POS, "The multiplicity of each number."),
@@ -32,6 +34,10 @@ class StirlingGeneratorCmd(Command):
     def flat_generator(self):
         for word in generateFlatStirlingPermutations(self.options):
             yield word
+
+    def __str__(self):
+        params = {"n": self.options.n, "k": self.options.k}
+        return f"StirlingPermutations({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
         
 
 """

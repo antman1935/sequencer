@@ -10,6 +10,7 @@ class ParamType(StrEnum):
     NATURAL = "Natural number"
     INTEGER = "Integers"
     INT_POS = "Positive integers"
+    BOOL = "Boolean"
 
     """
     This function validates the parameter based on the ParamType and returns the valid
@@ -30,6 +31,12 @@ class ParamType(StrEnum):
                 conv_value = int(value)
                 assert conv_value > 0, "Positive integers should be greater than 0."
                 return conv_value
+            case ParamType.BOOL:
+                if value.lower() in ["f", "false", "n", "no"]:
+                    return False
+                elif value.lower() in ["t", "true", "y", "yes"]:
+                    return True
+                assert False, "Value is not in the list of acceptable boolean values."
             case _:
                 raise Exception("Unsupported parameter type:", param_type)
 
@@ -44,6 +51,9 @@ class CommandParameter:
         self.required = required
         self.param_type = param_type
         self.description = description
+
+    def __str__(self):
+        return f"({self.param_type}) {self.name}{' (required)' if self.required else ''} - {self.description}"
 
 """
 Given a list of parameters, allows for a parameter string matching those parameters to be parsed and
@@ -63,14 +73,15 @@ class CommandParser:
     This function also guarantees that all required parameters are set.
     """
     def parseInput(self, param_str: str):
-        params = param_str.split("|")
+        params = param_str.split("/")
         param_dict = {}
-        for param_pair in params:
-            [param_name, param_value] = param_pair.split(":")
-            assert param_name in self.parameters, f"Invalid parameter passed: {param_name}"
+        if param_str != "":
+            for param_pair in params:
+                [param_name, param_value] = param_pair.split(":")
+                assert param_name in self.parameters, f"Invalid parameter passed: {param_name}"
 
-            value = ParamType.validateAndConvertParameter(self.parameters[param_name].param_type, param_value)
-            param_dict[param_name] = value
+                value = ParamType.validateAndConvertParameter(self.parameters[param_name].param_type, param_value)
+                param_dict[param_name] = value
 
         for name, param in self.parameters.items():
             if param.required:
@@ -89,6 +100,9 @@ class Command:
     
     def flat_generator(self):
         return None
+    
+    def __str__(self):
+        raise Exception("unimplemented")
 
     """
     Convienence function for testing generator output. Given a command that generates words, check that

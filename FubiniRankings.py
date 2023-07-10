@@ -14,6 +14,8 @@ parameters for this generator and gives access to the generator with
 those parameters.
 """
 class FubiniGeneratorCmd(Command):
+    name: str = "fubini"
+    description: str = "Fubini Rankings"
     parameters: list[CommandParameter] = [
         CommandParameter("n", True, ParamType.NATURAL, "The number of positions to give a rank."),
         CommandParameter("k", False, ParamType.INT_POS, "The maximum number of positions in an individual tie."),
@@ -29,6 +31,10 @@ class FubiniGeneratorCmd(Command):
     def generator(self):
         for word in generateFubiniRankings(self.options):
             yield word
+
+    def __str__(self):
+        params = {"n": self.options.n, "k": self.options.k, "t": self.options.t}
+        return f"FubiniRankings({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
         
 
 """

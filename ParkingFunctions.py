@@ -14,6 +14,8 @@ parameters for this generator and gives access to the generator with
 those parameters.
 """
 class ParkingFunctionGeneratorCmd(Command):
+    name: str = "parking_func"
+    description: str = "Parking Functions"
     parameters: list[CommandParameter] = [
         CommandParameter("n", True, ParamType.NATURAL, "The length of the string"),
     ]
@@ -27,6 +29,10 @@ class ParkingFunctionGeneratorCmd(Command):
     def generator(self):
         for word in generateParkingFunctions(self.options):
             yield word
+
+    def __str__(self):
+        params = {"n": self.options.n}
+        return f"ParkingFunctions({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
         
 
 """
