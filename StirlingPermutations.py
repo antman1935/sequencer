@@ -9,6 +9,23 @@
 from CmdTools import CommandParameter, ParamType, CommandParser, Command
 
 """
+This class allows us to pass arguments to the Stirling Permutation ranking
+generator below to allow any of the following restrictions to the
+rankings we generate:
+
+1. n - The number of positions to give rankings.
+2. k - The multiplicity of each number in the permutation. E.g
+       k=2 gets 1122 while k=3 gets 111222.
+"""
+class StirlingGeneratorOptions:
+    def __init__(self, n, k = 2):
+        self.n = n
+        self.k = k
+
+    def getParameters(self):
+        return {"n": self.n, "k": self.k}
+
+"""
 This class takes in a string with all the necessary and optional
 parameters for this generator and gives access to the generator with
 those parameters.
@@ -21,6 +38,7 @@ class StirlingGeneratorCmd(Command):
         CommandParameter("k", False, ParamType.INT_POS, "The multiplicity of each number."),
     ]
     parser: CommandParser = CommandParser(parameters)
+    options_class = StirlingGeneratorOptions
 
 
     def __init__(self, param_str: str):
@@ -40,19 +58,7 @@ class StirlingGeneratorCmd(Command):
         return f"StirlingPermutations({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
         
 
-"""
-This class allows us to pass arguments to the Stirling Permutation ranking
-generator below to allow any of the following restrictions to the
-rankings we generate:
 
-1. n - The number of positions to give rankings.
-2. k - The multiplicity of each number in the permutation. E.g
-       k=2 gets 1122 while k=3 gets 111222.
-"""
-class StirlingGeneratorOptions:
-    def __init__(self, n, k = 2):
-        self.n = n
-        self.k = k
 
 #####################################################################
 #                                                                   #

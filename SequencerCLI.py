@@ -1,12 +1,12 @@
 import sys, getopt
-from SequencerAPI import PointAPI
+from SequencerAPI import PointAPI, RangeAPI
 from CatalanWords import CatalanGeneratorCmd
 from FubiniRankings import FubiniGeneratorCmd
 from ParkingFunctions import ParkingFunctionGeneratorCmd
 from StirlingPermutations import StirlingGeneratorCmd
 from TypeBPartitions import TypeBPartitionGeneratorCmd
 
-apis = [PointAPI]
+apis = [PointAPI, RangeAPI]
 commands = [CatalanGeneratorCmd, FubiniGeneratorCmd, ParkingFunctionGeneratorCmd, StirlingGeneratorCmd, TypeBPartitionGeneratorCmd]
 
 def main(argv):

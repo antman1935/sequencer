@@ -1,7 +1,7 @@
 ﻿# author: antman1935, anthony.lamont99@yahoo.com
 
 from enum import StrEnum
-
+from Dimensions import ComputedDimension, ParameterDimension
 """
 Encapsulates the logic for validating different data types of parameters that can
 be passed to the generators.
@@ -11,6 +11,7 @@ class ParamType(StrEnum):
     INTEGER = "Integers"
     INT_POS = "Positive integers"
     BOOL = "Boolean"
+    LIST_DIM = "List of dimensions"
 
     """
     This function validates the parameter based on the ParamType and returns the valid
@@ -37,6 +38,34 @@ class ParamType(StrEnum):
                 elif value.lower() in ["t", "true", "y", "yes"]:
                     return True
                 assert False, "Value is not in the list of acceptable boolean values."
+            case ParamType.LIST_DIM:
+                dim_token_list = value.split(",")
+                dim_list = []
+                for token in dim_token_list:
+                    [name, dim_type] = token.split("-")
+                    if dim_type in ["p", "param", "parameter"]:
+                        dim_list.append(ParameterDimension(name))
+                    elif dim_type in ["c", "comp", "computed"]:
+                        dim_list.append(ComputedDimension(name))
+                    else:
+                        assert False, "Value is not in the list of acceptable dimension types."
+                return dim_list
+            case _:
+                raise Exception("Unsupported parameter type:", param_type)
+            
+    def typeMin(param_type):
+        match param_type:
+            case ParamType.NATURAL:
+                # ℕ, value must be integer and >= 0
+                return 0
+            case ParamType.INTEGER:
+                # ℤ, value must be integer
+                return 0
+            case ParamType.INT_POS:
+                # ℤ^+, value must be positive integer
+                return 1
+            case ParamType.BOOL:
+                return 0
             case _:
                 raise Exception("Unsupported parameter type:", param_type)
 
@@ -88,6 +117,10 @@ class CommandParser:
                 assert name in param_dict, f"Required parameter {name} is not set."
 
         return param_dict
+    
+class CommandOptions:
+    def getParameters(self):
+        raise Exception("unimplemented")
 
 
 """

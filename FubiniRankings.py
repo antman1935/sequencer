@@ -6,7 +6,29 @@
 #                                                                   #
 #####################################################################
 
-from CmdTools import CommandParameter, ParamType, CommandParser, Command
+from CmdTools import CommandParameter, ParamType, CommandParser, Command, CommandOptions
+
+"""
+This class allows us to pass arguments to the fubini ranking
+generator below to allow any of the following restrictions to the
+rankings we generate:
+
+1. n - The number of positions to give rankings.
+2. k - The maximum number of positions in an individual tie. E.g
+       [1,2,2,4,4,6,6,6] has 2 ties between two positions (2/4) and 1
+       tie between 3 positions, so k < 3 would cause this fubini
+       ranking to be omitted by the generator.
+3. t - The maximum number of ties. [1,2,2,4,4,6,6,6] has 3 ties, so
+       t < 3 would cause this fubini ranking to be omitted.
+"""
+class FubiniGeneratorOptions(CommandOptions):
+    def __init__(self, n, k = None, t = None):
+        self.n = n
+        self.k = k
+        self.t = t
+
+    def getParameters(self):
+        return {"n": self.n, "k": self.k, "t": self.t}
 
 """
 This class takes in a string with all the necessary and optional
@@ -22,6 +44,7 @@ class FubiniGeneratorCmd(Command):
         CommandParameter("t", False, ParamType.NATURAL, "The maximum number of ties."),
     ]
     parser: CommandParser = CommandParser(parameters)
+    options_class = FubiniGeneratorOptions
 
 
     def __init__(self, param_str: str):
@@ -35,26 +58,6 @@ class FubiniGeneratorCmd(Command):
     def __str__(self):
         params = {"n": self.options.n, "k": self.options.k, "t": self.options.t}
         return f"FubiniRankings({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
-        
-
-"""
-This class allows us to pass arguments to the fubini ranking
-generator below to allow any of the following restrictions to the
-rankings we generate:
-
-1. n - The number of positions to give rankings.
-2. k - The maximum number of positions in an individual tie. E.g
-       [1,2,2,4,4,6,6,6] has 2 ties between two positions (2/4) and 1
-       tie between 3 positions, so k < 3 would cause this fubini
-       ranking to be omitted by the generator.
-3. t - The maximum number of ties. [1,2,2,4,4,6,6,6] has 3 ties, so
-       t < 3 would cause this fubini ranking to be omitted.
-"""
-class FubiniGeneratorOptions:
-    def __init__(self, n, k = None, t = None):
-        self.n = n
-        self.k = k
-        self.t = t
 
 #####################################################################
 #                                                                   #
@@ -93,18 +96,6 @@ def generateFubiniRankings(options: FubiniGeneratorOptions):
 
     for ranking in helper([], {i+1:0 for i in range(options.n)}):
         yield ranking
-
-def getTies(ranking: list[int]):
-    places = [0 for i in ranking]
-    for rank in ranking:
-        places[rank-1] += 1
-    return sum([rankcount > 1 for rankcount in places])
-
-def getRanksInTies(ranking: list[int]):
-    places = [0 for i in ranking]
-    for rank in ranking:
-        places[rank-1] += 1
-    return sum([rankcount if rankcount > 1 else 0 for rankcount in places])
 
 #####################################################################
 #                                                                   #
