@@ -1,7 +1,14 @@
 ﻿# author: antman1935, anthony.lamont99@yahoo.com
 
-from enum import StrEnum
+from enum import Enum, StrEnum
 from Dimensions import ComputedDimension, ParameterDimension
+
+class OutputType(Enum):
+    OEIS_LOOKUP = 1
+    RAW = 2
+    ASCII_TABLE = 3
+    LATEX_TABLE = 4
+
 """
 Encapsulates the logic for validating different data types of parameters that can
 be passed to the generators.
@@ -12,6 +19,7 @@ class ParamType(StrEnum):
     INT_POS = "Positive integers"
     BOOL = "Boolean"
     LIST_DIM = "List of dimensions"
+    OUTPUT = "Table output"
 
     """
     This function validates the parameter based on the ParamType and returns the valid
@@ -42,7 +50,9 @@ class ParamType(StrEnum):
                 dim_token_list = value.split(",")
                 dim_list = []
                 for token in dim_token_list:
-                    [name, dim_type] = token.split("-")
+                    tokens = token.split("-")
+                    assert len(tokens) == 2, f"Invalid parameter type provided: {token}"
+                    [name, dim_type] = tokens
                     if dim_type in ["p", "param", "parameter"]:
                         dim_list.append(ParameterDimension(name))
                     elif dim_type in ["c", "comp", "computed"]:
@@ -50,6 +60,18 @@ class ParamType(StrEnum):
                     else:
                         assert False, "Value is not in the list of acceptable dimension types."
                 return dim_list
+            case ParamType.OUTPUT:
+                match value:
+                    case "oeis":
+                        return OutputType.OEIS_LOOKUP
+                    case "raw":
+                        return OutputType.RAW
+                    case "ascii":
+                        return OutputType.ASCII_TABLE
+                    case "latex":
+                        return OutputType.LATEX_TABLE
+                    case _:
+                        raise Exception("Unsupported output type:", value)
             case _:
                 raise Exception("Unsupported parameter type:", param_type)
             

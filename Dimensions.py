@@ -1,3 +1,5 @@
+# author: antman1935, anthony.lamont99@yahoo.com
+
 from enum import Enum
 
 class DimensionType(Enum):
@@ -36,8 +38,8 @@ def getMultiplicityG1Sum(word: list[int]):
     return sum([value for _, value in elms.items() if value > 1])
 
 computed_dims = [
-    DimensionComputation("mult>1", "Returns the number of elements in the word with multiplicity > 1", getMultiplicityG1Count),
-    DimensionComputation("Sum(mult>1)", "Returns the sum of the multiplicity of the elements with multiplicity > 1", getMultiplicityG1Sum),
+    DimensionComputation("mult_g_1", "Returns the number of elements in the word with multiplicity > 1", getMultiplicityG1Count),
+    DimensionComputation("sum_mult_g_1", "Returns the sum of the multiplicity of the elements with multiplicity > 1", getMultiplicityG1Sum),
 ]
 
 for dim in computed_dims:
@@ -49,6 +51,7 @@ class ComputedDimension(Dimension):
 
     def __init__(self, name):
         super().__init__(DimensionType.COMPUTED, name)
+        assert len(ComputedDimension.computed_statistics) == len(computed_dims)
         assert self.name in ComputedDimension.computed_statistics, f"Computed dimension {self.name} does not exist."
         self.func = ComputedDimension.computed_statistics[self.name].function
 

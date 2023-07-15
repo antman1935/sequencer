@@ -1,3 +1,5 @@
+# author: antman1935, anthony.lamont99@yahoo.com
+
 import sys, getopt
 from SequencerAPI import PointAPI, RangeAPI
 from CatalanWords import CatalanGeneratorCmd
