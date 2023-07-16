@@ -6,7 +6,8 @@
 #                                                                   #
 #####################################################################
 
-from CmdTools import CommandParameter, ParamType, CommandParser, Command
+from CmdTools import Command, CommandOptions
+from Parameters import CommandParameter, ParamType, CommandParser
 
 """
 This class allows us to pass arguments to the type b partition
@@ -15,7 +16,7 @@ rankings we generate:
 
 1. n - The length of the word
 """
-class TypeBPartitionGeneratorOptions:
+class TypeBPartitionGeneratorOptions(CommandOptions):
     def __init__(self, n):
         self.n = n
 
@@ -41,7 +42,7 @@ class TypeBPartitionGeneratorCmd(Command):
         params = TypeBPartitionGeneratorCmd.parser.parseInput(param_str)
         self.options = TypeBPartitionGeneratorOptions(params["n"])
 
-    def generator(self):
+    def internal_generator(self):
         for word in generateTypeBPartitions(self.options):
             yield word
 

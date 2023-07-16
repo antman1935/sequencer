@@ -6,7 +6,8 @@
 #                                                                   #
 #####################################################################
 
-from CmdTools import CommandParameter, ParamType, CommandParser, Command, CommandOptions
+from CmdTools import Command, CommandOptions
+from Parameters import CommandParameter, ParamType, CommandParser
 
 """
 This class allows us to pass arguments to the catalan word
@@ -41,7 +42,7 @@ class CatalanGeneratorCmd(Command):
         params = CatalanGeneratorCmd.parser.parseInput(param_str)
         self.options = CatalanGeneratorOptions(params["n"])
 
-    def generator(self):
+    def internal_generator(self):
         for word in generateCatalanWords(self.options):
             yield word
 

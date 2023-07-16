@@ -6,7 +6,8 @@
 #                                                                   #
 #####################################################################
 
-from CmdTools import CommandParameter, ParamType, CommandParser, Command, CommandOptions
+from CmdTools import Command, CommandOptions
+from Parameters import CommandParameter, ParamType, CommandParser
 
 """
 This class allows us to pass arguments to the fubini ranking
@@ -51,7 +52,7 @@ class FubiniGeneratorCmd(Command):
         params = FubiniGeneratorCmd.parser.parseInput(param_str)
         self.options = FubiniGeneratorOptions(params["n"], params.get("k", None), params.get("t", None))
 
-    def generator(self):
+    def internal_generator(self):
         for word in generateFubiniRankings(self.options):
             yield word
 

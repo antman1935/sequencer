@@ -6,7 +6,8 @@
 #                                                                   #
 #####################################################################
 
-from CmdTools import CommandParameter, ParamType, CommandParser, Command
+from CmdTools import Command, CommandOptions
+from Parameters import CommandParameter, ParamType, CommandParser
 
 """
 This class allows us to pass arguments to the parking function
@@ -15,7 +16,7 @@ rankings we generate:
 
 1. n - The length of the word
 """
-class ParkingFunctionGeneratorOptions:
+class ParkingFunctionGeneratorOptions(CommandOptions):
     def __init__(self, n):
         self.n = n
 
@@ -41,7 +42,7 @@ class ParkingFunctionGeneratorCmd(Command):
         params = ParkingFunctionGeneratorCmd.parser.parseInput(param_str)
         self.options = ParkingFunctionGeneratorOptions(params["n"])
 
-    def generator(self):
+    def internal_generator(self):
         for word in generateParkingFunctions(self.options):
             yield word
 

@@ -1,6 +1,7 @@
 # author: antman1935, anthony.lamont99@yahoo.com
 
-from CmdTools import Command, CommandParameter, ParamType, CommandParser, OutputType
+from CmdTools import Command
+from Parameters import CommandParameter, ParamType, CommandParser, OutputType
 class SequencerAPI:
     def __init__(self):
         self.cmd = None

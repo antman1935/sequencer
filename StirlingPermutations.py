@@ -6,7 +6,8 @@
 #                                                                   #
 #####################################################################
 
-from CmdTools import CommandParameter, ParamType, CommandParser, Command
+from CmdTools import Command, CommandOptions
+from Parameters import CommandParameter, ParamType, CommandParser
 
 """
 This class allows us to pass arguments to the Stirling Permutation ranking
@@ -17,7 +18,7 @@ rankings we generate:
 2. k - The multiplicity of each number in the permutation. E.g
        k=2 gets 1122 while k=3 gets 111222.
 """
-class StirlingGeneratorOptions:
+class StirlingGeneratorOptions(CommandOptions):
     def __init__(self, n, k = 2):
         self.n = n
         self.k = k
@@ -45,7 +46,7 @@ class StirlingGeneratorCmd(Command):
         params = StirlingGeneratorCmd.parser.parseInput(param_str)
         self.options = StirlingGeneratorOptions(params["n"], params.get("k", 2))
 
-    def generator(self):
+    def internal_generator(self):
         for word in generateStirlingPermutations(self.options):
             yield word
 
