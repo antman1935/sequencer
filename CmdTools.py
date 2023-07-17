@@ -40,7 +40,7 @@ class Command:
         return False
     
     def register(commandClass):
-        assert not commandClass.name in Command.commands, f"The name {commandClass.name} is already associated with a command."
+        assert not commandClass.name in Command.commands, f"The name {commandClass.name} is already associated with the command {Command.commands[commandClass.name]}. Registering {commandClass} failed."
         Command.commands[commandClass.name] = commandClass
 
     """

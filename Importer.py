@@ -1,3 +1,5 @@
+# author: antman1935, anthony.lamont99@yahoo.com
+
 import os
 import importlib
 
@@ -10,10 +12,8 @@ class Importer:
 
         for filename in os.listdir(subdir):
             name = filename.split(".")
-            print(name)
             if len(name) != 2 or name[1] != "py":
                 continue
 
             module_name = ".".join(parts + [name[0]])
-            print("importing", module_name)
             importlib.import_module(module_name)

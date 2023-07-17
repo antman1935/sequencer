@@ -1,11 +1,9 @@
 # author: antman1935, anthony.lamont99@yahoo.com
 
 import sys, getopt
-from SequencerAPI import PointAPI, RangeAPI
+from SequencerAPI import SequencerAPI
 from Restrictions import Restriction
 from CmdTools import Command
-
-apis = [PointAPI, RangeAPI]
 
 def main(argv):
     api = None
@@ -14,8 +12,6 @@ def main(argv):
     command_params = None
     restriction_list = []
     help_requested = False
-
-    api_dict = {apiClass.name.lower(): apiClass for apiClass in apis}
 
     try:
         opts, args = getopt.getopt(argv,"ha:c:r:",["api=", "command=", "restrictions="])
@@ -28,7 +24,7 @@ def main(argv):
         elif opt in ["-a", "--api"]:
             api_args = arg.split("/")
             api_name = api_args[0].lower()
-            api = api_dict[api_name]
+            api = SequencerAPI.apis[api_name]
             api_params = "/".join(api_args[1:])
         elif opt in ["-c", "--command"]:
             cmd_args = arg.split("/")
@@ -36,7 +32,6 @@ def main(argv):
             command = Command.commands[cmd_name]
             command_params = "/".join(cmd_args[1:])
         elif opt in ["-r", "--restrictions"]:
-            print("parsing restriction", arg)
             res = []
             res_tokens = arg.split("//")
             for res_token in res_tokens:
@@ -47,7 +42,7 @@ def main(argv):
         print(f"usage: SequencerCLI.py -a api_name/api_arguments -c command/command_arguments -r restrictions_list")
         if api is None:
             print("API hasn't been set(-a/--api API name[/parameter_name:parameter_value]). Choose from:")
-            for h_api in apis:
+            for h_api in SequencerAPI.apis:
                 print(f"\t-{h_api.name} - {h_api.description}")
                 print("\tParameters:")
                 for param in h_api.parameters:
