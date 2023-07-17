@@ -1,6 +1,6 @@
 ﻿# author: antman1935, anthony.lamont99@yahoo.com
 
-from Restrictions import Restriction
+from Restriction import Restriction
     
 class CommandOptions:
     def getParameters(self):

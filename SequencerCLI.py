@@ -2,7 +2,7 @@
 
 import sys, getopt
 from SequencerAPI import SequencerAPI
-from Restrictions import Restriction
+from Restriction import Restriction
 from CmdTools import Command
 
 def main(argv):
