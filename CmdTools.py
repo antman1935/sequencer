@@ -11,6 +11,7 @@ Base class for all of the commands we'll create. Has a generator function that s
 be overriden by all the subclasses.
 """
 class Command:
+    commands = {}
     def internal_generator(self):
         raise Exception("unimplemented")
     
@@ -37,6 +38,10 @@ class Command:
             if sum(all) == len(all):
                 return True
         return False
+    
+    def register(commandClass):
+        assert not commandClass.name in Command.commands, f"The name {commandClass.name} is already associated with a command."
+        Command.commands[commandClass.name] = commandClass
 
     """
     Convienence function for testing generator output. Given a command that generates words, check that
@@ -65,4 +70,9 @@ class Command:
         print("Success!")
         return True
 
+Command.register = staticmethod(Command.register)
 Command.generator_test = staticmethod(Command.generator_test)
+
+from Importer import Importer
+
+Importer.importSubdirectory("Commands")

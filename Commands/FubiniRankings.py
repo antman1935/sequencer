@@ -59,6 +59,7 @@ class FubiniGeneratorCmd(Command):
     def __str__(self):
         params = {"n": self.options.n, "k": self.options.k, "t": self.options.t}
         return f"FubiniRankings({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
+Command.register(FubiniGeneratorCmd)
 
 #####################################################################
 #                                                                   #

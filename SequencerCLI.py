@@ -3,14 +3,9 @@
 import sys, getopt
 from SequencerAPI import PointAPI, RangeAPI
 from Restrictions import Restriction
-from CatalanWords import CatalanGeneratorCmd
-from FubiniRankings import FubiniGeneratorCmd
-from ParkingFunctions import ParkingFunctionGeneratorCmd
-from StirlingPermutations import StirlingGeneratorCmd
-from TypeBPartitions import TypeBPartitionGeneratorCmd
+from CmdTools import Command
 
 apis = [PointAPI, RangeAPI]
-commands = [CatalanGeneratorCmd, FubiniGeneratorCmd, ParkingFunctionGeneratorCmd, StirlingGeneratorCmd, TypeBPartitionGeneratorCmd]
 
 def main(argv):
     api = None
@@ -21,7 +16,6 @@ def main(argv):
     help_requested = False
 
     api_dict = {apiClass.name.lower(): apiClass for apiClass in apis}
-    command_dict = {commandClass.name.lower(): commandClass for commandClass in commands}
 
     try:
         opts, args = getopt.getopt(argv,"ha:c:r:",["api=", "command=", "restrictions="])
@@ -39,7 +33,7 @@ def main(argv):
         elif opt in ["-c", "--command"]:
             cmd_args = arg.split("/")
             cmd_name = cmd_args[0].lower()
-            command = command_dict[cmd_name]
+            command = Command.commands[cmd_name]
             command_params = "/".join(cmd_args[1:])
         elif opt in ["-r", "--restrictions"]:
             print("parsing restriction", arg)
@@ -66,7 +60,7 @@ def main(argv):
             print("")
         if command is None:
             print("Command hasn't been set(-c/--command Command name[/parameter_name:parameter_value]). Choose from:")
-            for cmd in commands:
+            for cmd in Command.commands:
                 print(f"\t-{cmd.name} - {cmd.description}")
                 print("\tParameters:")
                 for param in cmd.parameters:

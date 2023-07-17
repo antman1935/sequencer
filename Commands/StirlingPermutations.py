@@ -58,7 +58,7 @@ class StirlingGeneratorCmd(Command):
         params = {"n": self.options.n, "k": self.options.k}
         return f"StirlingPermutations({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
         
-
+Command.register(StirlingGeneratorCmd)
 
 
 #####################################################################

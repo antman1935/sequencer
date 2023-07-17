@@ -50,6 +50,7 @@ class TypeBPartitionGeneratorCmd(Command):
         params = {"n": self.options.n}
         return f"TypeBPartitions({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
         
+Command.register(TypeBPartitionGeneratorCmd)
 
 #####################################################################
 #                                                                   #
