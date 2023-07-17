@@ -6,6 +6,7 @@ from Restriction import Restriction
 from CmdTools import Command
 
 def main(argv):
+    usage_string = "usage: SequencerCLI.py -a api_name/api_arguments -c command/command_arguments (-r restrictions_list)*"
     api = None
     api_params = None
     command = None
@@ -39,10 +40,10 @@ def main(argv):
             restriction_list.append(res)
 
     if help_requested:
-        print(f"usage: SequencerCLI.py -a api_name/api_arguments -c command/command_arguments -r restrictions_list")
+        print(usage_string)
         if api is None:
             print("API hasn't been set(-a/--api API name[/parameter_name:parameter_value]). Choose from:")
-            for h_api in SequencerAPI.apis:
+            for h_api in SequencerAPI.apis.values():
                 print(f"\t-{h_api.name} - {h_api.description}")
                 print("\tParameters:")
                 for param in h_api.parameters:
@@ -55,7 +56,7 @@ def main(argv):
             print("")
         if command is None:
             print("Command hasn't been set(-c/--command Command name[/parameter_name:parameter_value]). Choose from:")
-            for cmd in Command.commands:
+            for cmd in Command.commands.values():
                 print(f"\t-{cmd.name} - {cmd.description}")
                 print("\tParameters:")
                 for param in cmd.parameters:
@@ -66,10 +67,25 @@ def main(argv):
             for param in command.parameters:
                 print(f"\t{param}")
             print("")
+        
+        print("Restrictions (filters) can be set on the datasets you generate. Every time you pass -r on the command line,\n"
+              "you give a list of restrictions that are evaluated on the element, and the element is included in the dataset\n"
+              "if they all evaluate to true. If -r is passed multliple times, an element is included if it passes any\n"
+              "restriction list. Syntax for -r parameter: restriction_name(/param:value)*(//restriction_name(/param:value)*)*\n"
+              "Here is the full list of restrictions available:")
+        for res in Restriction.restrictions.values():
+                print(f"\t-{res.name} - {res.description}")
+                if not hasattr(res, "parameters"):
+                    print("")
+                    continue
+                print("\tParameters:")
+                for param in res.parameters:
+                    print(f"\t\t{param}")
+                print("")
         sys.exit()
 
     if api is None or command is None:
-        print(f"usage: SequencerCLI.py -a api_name/api_arguments -c command/command_arguments")
+        print(usage_string)
         sys.exit(2)
 
     api_inst = api(api_params)
