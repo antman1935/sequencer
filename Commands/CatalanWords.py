@@ -6,6 +6,10 @@
 #                                                                   #
 #####################################################################
 
+if __name__ == "__main__":
+    import os, sys
+    sys.path.append(os.getcwd())
+
 from CmdTools import Command, CommandOptions
 from Parameters import CommandParameter, ParamType, CommandParser
 
@@ -39,6 +43,7 @@ class CatalanGeneratorCmd(Command):
 
 
     def __init__(self, param_str: str):
+        super().__init__()
         params = CatalanGeneratorCmd.parser.parseInput(param_str)
         self.options = CatalanGeneratorOptions(params["n"])
 
@@ -49,7 +54,6 @@ class CatalanGeneratorCmd(Command):
     def __str__(self):
         params = {"n": self.options.n}
         return f"CatalanWords({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
-Command.register(CatalanGeneratorCmd)
 
 #####################################################################
 #                                                                   #

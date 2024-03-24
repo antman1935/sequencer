@@ -4,6 +4,7 @@ import sys, getopt
 from SequencerAPI import SequencerAPI
 from Restriction import Restriction
 from CmdTools import Command
+import Commands.CommandRegistration # registers all commands
 
 def main(argv):
     usage_string = "usage: SequencerCLI.py -a api_name/api_arguments -c command/command_arguments (-r restrictions_list)*"

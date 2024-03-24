@@ -6,6 +6,10 @@
 #                                                                   #
 #####################################################################
 
+if __name__ == "__main__":
+    import os, sys
+    sys.path.append(os.getcwd())
+
 from CmdTools import Command, CommandOptions
 from Parameters import CommandParameter, ParamType, CommandParser
 
@@ -49,6 +53,7 @@ class FubiniGeneratorCmd(Command):
 
 
     def __init__(self, param_str: str):
+        super().__init__()
         params = FubiniGeneratorCmd.parser.parseInput(param_str)
         self.options = FubiniGeneratorOptions(params["n"], params.get("k", None), params.get("t", None))
 
@@ -59,7 +64,6 @@ class FubiniGeneratorCmd(Command):
     def __str__(self):
         params = {"n": self.options.n, "k": self.options.k, "t": self.options.t}
         return f"FubiniRankings({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
-Command.register(FubiniGeneratorCmd)
 
 #####################################################################
 #                                                                   #
@@ -127,7 +131,7 @@ def base_generator_test():
     return Command.generator_test(f"Running Fubini generator test ({param_str})", cmd.generator(), expected_values)
 
 def test_k_generator():
-    param_str = "n:3|k:2"
+    param_str = "n:3/k:2"
     expected_values = [
         [1,1,3],
         [1,3,1],
@@ -147,7 +151,7 @@ def test_k_generator():
     return Command.generator_test(f"Running Fubini generator test ({param_str})", cmd.generator(), expected_values)
 
 def test_t_generator():
-    param_str = "n:3|k:3|t:0"
+    param_str = "n:3/k:3/t:0"
     expected_values = [
         [1,2,3],
         [1,3,2],

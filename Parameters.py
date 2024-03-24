@@ -125,7 +125,7 @@ class CommandParser:
     This function takes a string of parameters and extracts them for use in the specfied command.
     The functions returns the options in a dictionary from param name to value.
     The param_str is of the form
-        param1_name:param1_value[|paramN_name:oaramN_value]
+        param1_name:param1_value[/paramN_name:paramN_value]
     This function also guarantees that all required parameters are set.
     """
     def parseInput(self, param_str: str):

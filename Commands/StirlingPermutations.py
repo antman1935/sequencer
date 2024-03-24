@@ -6,6 +6,10 @@
 #                                                                   #
 #####################################################################
 
+if __name__ == "__main__":
+    import os, sys
+    sys.path.append(os.getcwd())
+
 from CmdTools import Command, CommandOptions
 from Parameters import CommandParameter, ParamType, CommandParser
 
@@ -43,6 +47,7 @@ class StirlingGeneratorCmd(Command):
 
 
     def __init__(self, param_str: str):
+        super().__init__()
         params = StirlingGeneratorCmd.parser.parseInput(param_str)
         self.options = StirlingGeneratorOptions(params["n"], params.get("k", 2))
 
@@ -58,8 +63,6 @@ class StirlingGeneratorCmd(Command):
         params = {"n": self.options.n, "k": self.options.k}
         return f"StirlingPermutations({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
         
-Command.register(StirlingGeneratorCmd)
-
 
 #####################################################################
 #                                                                   #
@@ -177,7 +180,7 @@ def base_generator_test():
     return Command.generator_test(f"Running Stirling Permutation generator test ({param_str})", cmd.generator(), expected_values)
 
 def test_k_generator():
-    param_str = "n:2|k:3"
+    param_str = "n:2/k:3"
     expected_values = [
         [1,1,1,2,2,2],
         [1,1,2,2,2,1],

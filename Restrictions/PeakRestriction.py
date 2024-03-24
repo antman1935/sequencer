@@ -20,7 +20,9 @@ class PeakRestriction(Restriction):
             word = makeWord(element)
         else:
             if not CacheKeys.WORD in cache:
-                cache[CacheKeys.WORD] = makeWord(element)
-            word = cache[CacheKeys.WORD]
+                cache[CacheKeys.WORD] = {}
+            if not str(element) in cache[CacheKeys.WORD]:
+                cache[CacheKeys.WORD][str(element)] = makeWord(element)
+            word = cache[CacheKeys.WORD][str(element)]
         return word.matchesPeakSet(self.peakset)
 Restriction.register(PeakRestriction)

@@ -1,0 +1,13 @@
+from Commands.CatalanWords import CatalanGeneratorCmd
+from Commands.FubiniRankings import FubiniGeneratorCmd
+from Commands.ParkingFunctions import ParkingFunctionGeneratorCmd
+from Commands.StirlingPermutations import StirlingGeneratorCmd
+from Commands.TypeBPartitions import TypeBPartitionGeneratorCmd
+
+from CmdTools import Command
+
+Command.register(CatalanGeneratorCmd)
+Command.register(FubiniGeneratorCmd)
+Command.register(ParkingFunctionGeneratorCmd)
+Command.register(StirlingGeneratorCmd)
+Command.register(TypeBPartitionGeneratorCmd)

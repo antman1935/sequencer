@@ -12,6 +12,8 @@ be overriden by all the subclasses.
 """
 class Command:
     commands = {}
+    def __init__(self):
+        self.restrictions = None
     def internal_generator(self):
         raise Exception("unimplemented")
     
@@ -72,7 +74,3 @@ class Command:
 
 Command.register = staticmethod(Command.register)
 Command.generator_test = staticmethod(Command.generator_test)
-
-from Importer import Importer
-
-Importer.importSubdirectory("Commands")

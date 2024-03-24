@@ -6,6 +6,10 @@
 #                                                                   #
 #####################################################################
 
+if __name__ == "__main__":
+    import os, sys
+    sys.path.append(os.getcwd())
+
 from CmdTools import Command, CommandOptions
 from Parameters import CommandParameter, ParamType, CommandParser
 
@@ -39,6 +43,7 @@ class TypeBPartitionGeneratorCmd(Command):
 
 
     def __init__(self, param_str: str):
+        super().__init__()
         params = TypeBPartitionGeneratorCmd.parser.parseInput(param_str)
         self.options = TypeBPartitionGeneratorOptions(params["n"])
 
@@ -50,7 +55,6 @@ class TypeBPartitionGeneratorCmd(Command):
         params = {"n": self.options.n}
         return f"TypeBPartitions({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
         
-Command.register(TypeBPartitionGeneratorCmd)
 
 #####################################################################
 #                                                                   #
