@@ -6,6 +6,13 @@
 #                                                                   #
 #####################################################################
 
+# TODO; Do all of the TODO's here and test your Command by running it
+# from the top level directory, i.e.
+#   `python3 Commands/YourCustomCommand.py`
+# Once all of the tests are passing with good coverage, register the
+# command so that it is usable from the cli. 
+# See Commands/CommandRegistration.py
+
 if __name__ == "__main__":
     import os, sys
     sys.path.append(os.getcwd())
@@ -14,16 +21,24 @@ from CmdTools import Command, CommandOptions
 from Parameters import CommandParameter, ParamType, CommandParser
 
 """
-This class allows us to pass arguments to the catalan word
-generator below to allow any of the following restrictions to the
+This class allows us to pass arguments to the generator below.
+It allows any of the following restrictions to the
 words we generate:
 
-1. n - The length of the word
+TODO: List arguments to your generator with descriptions.
+1. n - 
 """
-class CatalanGeneratorOptions(CommandOptions):
+class MyGeneratorOptions(CommandOptions):
+    """
+    TODO: Add all arguments to you generator.
+    """
     def __init__(self, n: int):
         self.n = n
 
+    """
+    TODO: Return all arguments to the initializer in a dictionary.
+    NOTE: The keys must match the __init__ method's parameters exactly.
+    """
     def getParameters(self):
         return {"n": self.n}
 
@@ -32,28 +47,32 @@ This class takes in a string with all the necessary and optional
 parameters for this generator and gives access to the generator with
 those parameters.
 """
-class CatalanGeneratorCmd(Command):
-    name: str = "catalan"
-    description: str = "Catalan Words"
+class MyGeneratorCmd(Command):
+    """
+    TODO: Fill in these fields with appropriate info. The name must be unique among the
+    Command subclasses. The parameter names must match the Option's classes __init__
+    parameters exactly.
+    """
+    name: str = ""
+    description: str = ""
     parameters: list[CommandParameter] = [
-        CommandParameter("n", True, ParamType.NATURAL, "The length of the string"),
+        CommandParameter("n", True, ParamType.NATURAL, ""),
     ]
     parser: CommandParser = CommandParser(parameters)
-    options_class = CatalanGeneratorOptions
+    options_class = MyGeneratorOptions
 
 
     def __init__(self, param_str: str):
         super().__init__()
-        params = CatalanGeneratorCmd.parser.parseInput(param_str)
-        self.options = CatalanGeneratorOptions(params["n"])
+        self.params = MyGeneratorCmd.parser.parseInput(param_str)
+        self.options = MyGeneratorOptions(**params)
 
     def internal_generator(self):
-        for word in generateCatalanWords(self.options):
+        for word in generate(self.options):
             yield word
 
     def __str__(self):
-        params = {"n": self.options.n}
-        return f"CatalanWords({'|'.join([str(key) + ':' + str(value) for key, value in params.items() if not value is None])})"
+        return f"Set({'|'.join([str(key) + ':' + str(value) for key, value in self.params.items() if not value is None])})"
 
 #####################################################################
 #                                                                   #
@@ -61,28 +80,12 @@ class CatalanGeneratorCmd(Command):
 #                                                                   #
 #####################################################################
 
-def generateCatalanWords(options: CatalanGeneratorOptions):
-    if options.n == 0:
-        yield []
-        return
-    
-    def helper(current_word):
-        if len(current_word) == options.n:
-            yield current_word[:]
-            return
-        prev = options.n if len(current_word) == 0 else current_word[-1]
-        prev = min(options.n, prev + 2)
-        for i in range(0, prev):
-            current_word.append(i)
-            for value in helper(current_word):
-                yield value
-            current_word.pop()
-        return
-
-    for value in helper([0]):
-        yield value
-
-    return
+"""
+TODO: implement generator code. See other Command subclasses for ideas.
+Implementations should use constant memory if possible.
+"""
+def generate(options: MyGeneratorOptions):
+   pass
 
 #####################################################################
 #                                                                   #
@@ -92,37 +95,12 @@ def generateCatalanWords(options: CatalanGeneratorOptions):
 
 def base_generator_test():
     param_str = "n:3"
+    # TODO: Enter all the expected values of your generator for n = 3, or other small enough case.
     expected_values = [
-        [0,0,0],
-        [0,0,1],
-        [0,1,0],
-        [0,1,1],
-        [0,1,2],
+
     ]
 
-    cmd = CatalanGeneratorCmd(param_str)
-    return Command.generator_test(f"Running Catalan generator test ({param_str})", cmd.generator(), expected_values)
-
-def base_generator_test2():
-    param_str = "n:4"
-    expected_values = [
-        [0,0,0,0],
-        [0,0,0,1],
-        [0,0,1,0],
-        [0,0,1,1],
-        [0,0,1,2],
-        [0,1,0,0],
-        [0,1,0,1],
-        [0,1,1,0],
-        [0,1,1,1],
-        [0,1,1,2],
-        [0,1,2,0],
-        [0,1,2,1],
-        [0,1,2,2],
-        [0,1,2,3],
-    ]
-
-    cmd = CatalanGeneratorCmd(param_str)
+    cmd = MyGeneratorCmd(param_str)
     return Command.generator_test(f"Running Catalan generator test ({param_str})", cmd.generator(), expected_values)
 
 def nis0_generator_test():
@@ -131,11 +109,11 @@ def nis0_generator_test():
         [],
     ]
 
-    cmd = CatalanGeneratorCmd(param_str)
+    cmd = MyGeneratorCmd(param_str)
     return Command.generator_test(f"Running Catalan generator test ({param_str})", cmd.generator(), expected_values)
 
 def tests():
-    test_funcs = [base_generator_test, base_generator_test2, nis0_generator_test]
+    test_funcs = [nis0_generator_test]
     print(f"Running {len(test_funcs)} tests for Catalan Generator.")
     success = sum([func() for func in test_funcs])
     print(f"{success}/{len(test_funcs)} tests passed.")
