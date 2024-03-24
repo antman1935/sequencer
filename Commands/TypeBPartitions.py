@@ -36,7 +36,7 @@ class TypeBPartitionGeneratorCmd(Command):
     name: str = "type_b"
     description: str = "Type B Partitions"
     parameters: list[CommandParameter] = [
-        CommandParameter("n", True, ParamType.NATURAL, "The length of the string"),
+        CommandParameter("n", True, ParamType.NATURAL, "The max value of symmetric set {-n,...,0,...,n}"),
     ]
     parser: CommandParser = CommandParser(parameters)
     options_class = TypeBPartitionGeneratorOptions

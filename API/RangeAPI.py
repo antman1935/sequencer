@@ -69,6 +69,9 @@ def printAsciiRow(row: list, column_widths: list[int], print_zeros = False):
 
 def printAsciiTable(result: dict[int, dict[int, int]], dimensions: list[str]):
     # get the row and column bounds, plus max column width for each column
+    if len(result) == 0:
+        print('Empty set.')
+        return
     row_bounds, column_bounds, column_widths = getTableBounds(result)
     dim_str = " \\ ".join(dimensions)
     column_widths["row_start"] = max(column_widths["row_start"], len(dim_str))

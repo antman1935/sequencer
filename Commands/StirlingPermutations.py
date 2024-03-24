@@ -39,7 +39,7 @@ class StirlingGeneratorCmd(Command):
     name: str = "stirling"
     description: str = "Stirling Permutations"
     parameters: list[CommandParameter] = [
-        CommandParameter("n", True, ParamType.NATURAL, "The number of positions to give a rank."),
+        CommandParameter("n", True, ParamType.NATURAL, "The maximum value for our permutation."),
         CommandParameter("k", False, ParamType.INT_POS, "The multiplicity of each number."),
     ]
     parser: CommandParser = CommandParser(parameters)
