@@ -65,7 +65,7 @@ class MyGeneratorCmd(Command):
     def __init__(self, param_str: str):
         super().__init__()
         self.params = MyGeneratorCmd.parser.parseInput(param_str)
-        self.options = MyGeneratorOptions(**params)
+        self.options = MyGeneratorOptions(**self.params)
 
     def internal_generator(self):
         for word in generate(self.options):
