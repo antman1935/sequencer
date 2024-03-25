@@ -23,9 +23,7 @@ class FlatRestriction(Restriction):
             word = makeWord(element)
         else:
             if not CacheKeys.WORD in cache:
-                cache[CacheKeys.WORD] = {}
-            if not str(element) in cache[CacheKeys.WORD]:
-                cache[CacheKeys.WORD][str(element)] = makeWord(element)
-            word = cache[CacheKeys.WORD][str(element)]
+                cache[CacheKeys.WORD] = makeWord(element)
+            word = cache[CacheKeys.WORD]
         return word.isFlattened(weak_ascents=self.weak_ascents, weak=self.weak_flat)
 Restriction.register(FlatRestriction)

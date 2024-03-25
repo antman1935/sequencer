@@ -72,7 +72,7 @@ def main(argv):
         print("Restrictions (filters) can be set on the datasets you generate. Every time you pass -r on the command line,\n"
               "you give a list of restrictions that are evaluated on the element, and the element is included in the dataset\n"
               "if they all evaluate to true. If -r is passed multliple times, an element is included if it passes any\n"
-              "restriction list. Syntax for -r parameter: restriction_name(/param:value)*(//restriction_name(/param:value)*)*\n"
+              "restriction list. Syntax for -r parameter: restriction_name(/param:value*)(//restriction_name(/param:value*)*)\n"
               "Here is the full list of restrictions available:")
         for res in Restriction.restrictions.values():
                 print(f"\t-{res.name} - {res.description}")
