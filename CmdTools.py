@@ -34,7 +34,7 @@ class Command:
     def checkRestrictions(self, element):
         if self.restrictions is None or len(self.restrictions) == 0:
             return True
-        cache = {}
+        cache = {} if len(self.restrictions) > 1 else None
         for restr_set in self.restrictions:
             all = [restriction.passes(element, cache) for restriction in restr_set]
             if sum(all) == len(all):

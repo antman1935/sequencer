@@ -99,7 +99,7 @@ def printResults(output_type: OutputType, result, dimensions: list[str]):
     match output_type:
         case OutputType.OEIS_LOOKUP:
             assert len(dimensions) == 1, "This output is only available for sequences."
-            print(f"{dimensions[0]}: {' '.join(['0' if not i in result else str(result[i]) for i in range(min(result.keys()), max(result.keys()) + 1)])}")
+            print(f"{dimensions[0]}({min(result.keys())}-{max(result.keys())}): {' '.join(['0' if not i in result else str(result[i]) for i in range(min(result.keys()), max(result.keys()) + 1)])}")
         case OutputType.RAW:
             print("Raw output:", result)
         case OutputType.ASCII_TABLE:

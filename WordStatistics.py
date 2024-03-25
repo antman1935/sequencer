@@ -48,14 +48,14 @@ of runs within the word (i.e. sequences of weakly ascending Letters). Also
 gives functionality for determining if a Word is flattened (i.e. the runs are
 in weakly increasing order according to the first Letter of each run).
 self.letters -> Array of Letters that the Word represents.
-self.runs -> List of lists of Letters representing the Word broken into its run.
+self.weak_runs -> List of lists of Letters representing the Word broken into its weak runs.
             Enumerated on construction.
 """
 class Word:
 
     def __init__(self, letters):
         self.letters = letters
-        self.runs = self.getRuns()
+        self.weak_runs = self.getRuns()
         self.peaks = self.getPeaks()
 
     def __str__(self):
@@ -79,37 +79,53 @@ class Word:
     def matchesPeakSet(self, peakset):
         return self.peaks == peakset
 
-    def getRuns(self):
+    """
+    Returns decomposition of word into maximal contiguous weakly increasing subsequences.
+    If weak is True, makes the condition strongly increasing.
+    """
+    def getRuns(self, weak = True):
         if len(self.letters) == 0:
             return []
         else:
-            curLetter = self.letters[0]
+            prevLetter = self.letters[0]
         runs = []
-        currentRun = [curLetter]
+        currentRun = [prevLetter]
         for i in range(1, len(self.letters)):
-            if curLetter <= self.letters[i]:
+            if weak and prevLetter <= self.letters[i]:
+                currentRun.append(self.letters[i])
+            elif (not weak) and prevLetter < self.letters[i]:
                 currentRun.append(self.letters[i])
             else:
                 runs.append(currentRun)
                 currentRun = [self.letters[i]]
-            curLetter = self.letters[i]
+            prevLetter = self.letters[i]
 
         runs.append(currentRun)
 
         return runs
 
     def getNumRuns(self):
-        return len(self.runs)
+        return len(self.weak_runs)
 
-    def isFlattened(self):
-        for i in range(len(self.runs) - 1):
-            if not (self.runs[i][0] <= self.runs[i+1][0]):
+    """
+    If weak_ascents is true consider runs to be weakly increasing. Otherwise strictly increasing.
+    If weak us true return True if starts of runs are weakly increasing. Otherwise only return True if they are strictly increasing.
+    """
+    def isFlattened(self, weak_ascents=True, weak=True):
+        if weak_ascents:
+            runs = self.weak_runs
+        else:
+            runs = self.getRuns(weak=False)
+        for i in range(len(runs) - 1):
+            if weak and not (runs[i][0] <= runs[i+1][0]):
+                return False
+            elif (not weak) and not (runs[i][0] < runs[i+1][0]):
                 return False
 
         return True
 
     def getRunType(self):
-        return [len(run) for run in self.runs]
+        return [len(run) for run in self.weak_runs]
 
 """
 Creates a Word object given an iterable, usually a string.
