@@ -25,21 +25,6 @@ def invert(d: dict[int, dict[int, int]]):
             new_d[y][x] = count
     return new_d
 
-def printMultipleTables(result, dimensions: list[str], print_func):
-    def helper(curr, i, idxs):
-        if i == len(dimensions) - 2:
-            print(f"Print Table for ({';'.join([dimensions[j] + '=' + str(idxs[j]) for j in range(len(idxs))])}):")
-            print_func(invert(curr), [dim for dim in reversed(dimensions[i:])])
-            return
-        for j in range(min(curr.keys()), max(curr.keys()) + 1):
-            if not j in curr:
-                continue
-            idxs.append(j)
-            helper(curr[j], i+1, idxs)
-            idxs.pop()
-
-    helper(result, 0, [])
-
 def getTableBounds(table):
     min_row = min(table.keys())
     max_row = max(table.keys())
@@ -50,13 +35,27 @@ def getTableBounds(table):
     for r in range(min_row, max_row + 1):
         min_column = min(min_column, min(table[r].keys()))
         max_column = max(max_column, max(table[r].keys()))
-        column_widths["row_start"] = max(column_widths["row_start"], len(str(r)))
-        for c, count in table[r].items():
-            if not c in column_widths:
-                column_widths[c] = 0
-            column_widths[c] = max(column_widths[c], len(str(count)))
             
-    return [min_row, max_row], [min_column, max_column], column_widths
+    return (min_row, max_row), (min_column, max_column)
+
+def printMultipleTables(result, dimensions: list[str], print_func):
+    def helper(curr, i, idxs):
+        if i == len(dimensions) - 2:
+            label = ';'.join([dimensions[j] + '=' + str(idxs[j]) for j in range(len(idxs))])
+            row_bounds, column_bounds = getTableBounds(curr)
+            [row_dim, col_dim] = reversed(dimensions[i:])
+            data = invert(curr)
+            data = [[0 if c not in data[r] else data[r][c] for c in range(column_bounds[0], column_bounds[1] + 1)] for r in range(row_bounds[0], row_bounds[1] + 1)]
+            print_func(label, row_bounds, row_dim, column_bounds, col_dim, data)
+            return
+        for j in range(min(curr.keys()), max(curr.keys()) + 1):
+            if not j in curr:
+                continue
+            idxs.append(j)
+            helper(curr[j], i+1, idxs)
+            idxs.pop()
+
+    helper(result, 0, [])
 
 def printAsciiRow(row: list, column_widths: list[int], print_zeros = False):
     out_str = "|"
@@ -67,21 +66,20 @@ def printAsciiRow(row: list, column_widths: list[int], print_zeros = False):
         out_str += f" {(width - len(str(p))) * ' '}{p} |"
     print(out_str)
 
-def printAsciiTable(result: dict[int, dict[int, int]], dimensions: list[str]):
-    # get the row and column bounds, plus max column width for each column
-    if len(result) == 0:
+def printAsciiTable(label: str, row_bounds: tuple[int, int], row_dim: str, col_bounds: tuple[int, int], col_dim: str, data: list[list[int]]):
+    if len(label) > 0:
+        print(f"Print Table for ({label}):")
+    if len(data) == 0 or len(data[0]) == 0:
         print('Empty set.')
-        return
-    row_bounds, column_bounds, column_widths = getTableBounds(result)
-    dim_str = " \\ ".join(dimensions)
-    column_widths["row_start"] = max(column_widths["row_start"], len(dim_str))
-    column_widths = [column_widths["row_start"]] + [column_widths[c] for c in range(column_bounds[0], column_bounds[1] + 1)]
 
-    data = [[0 if c not in result[r] else result[r][c] for c in range(column_bounds[0], column_bounds[1] + 1)] for r in range(row_bounds[0], row_bounds[1] + 1)]
+    dim_str = f"{row_dim} \\ {col_dim}"
+
+    column_widths = [max([len(str(data[r][c])) for r in range(row_bounds[0], row_bounds[1] + 1)]) for c in range(col_bounds[0], col_bounds[1] + 1)]
+    column_widths = [max(len(dim_str), max([len(str(r)) for r in range(row_bounds[0], row_bounds[1] + 1)]))] + [max(len(str(c)), cur) for c, cur in zip([c for c in range(col_bounds[0], col_bounds[1] + 1)], column_widths)]
 
     row_length = sum(column_widths) + 3 * len(column_widths) + 1
     print("-" * row_length)
-    printAsciiRow([dim_str] + [c for c in range(column_bounds[0], column_bounds[1] + 1)], column_widths, print_zeros=True)
+    printAsciiRow([dim_str] + [c for c in range(col_bounds[0], col_bounds[1] + 1)], column_widths, print_zeros=True)
     print("|"+("-" * (row_length-2))+"|")
     for r, row in zip([r for r in range(row_bounds[0], row_bounds[1] + 1)], data):
         if sum(row) == 0:
@@ -92,7 +90,7 @@ def printAsciiTable(result: dict[int, dict[int, int]], dimensions: list[str]):
         else:
             print("-" * row_length)
 
-def printLatexTable(result: dict[int, dict[int, int]], dimensions: list[str]):
+def printLatexTable(label: str, row_bounds: tuple[int, int], row_dim: str, col_bounds: tuple[int, int], col_dim: str, data: list[list[int]]):
     print("You gotta know when to hold them... know when to fold them. KNow when to walk away. KNow hmm hmmm")
 
 def printResults(output_type: OutputType, result, dimensions: list[str]):
@@ -105,15 +103,11 @@ def printResults(output_type: OutputType, result, dimensions: list[str]):
         case OutputType.ASCII_TABLE:
             if len(dimensions) == 1:
                 printResults(OutputType.OEIS_LOOKUP, result, dimensions)
-            elif len(dimensions) == 2:
-                printAsciiTable(invert(result), [dim for dim in reversed(dimensions)])
             else:
                 printMultipleTables(result, dimensions, printAsciiTable)
         case OutputType.LATEX_TABLE:
-            if len(dimensions) == 2:
-                printLatexTable(invert(result), [dim for dim in reversed(dimensions)])
-            else:
-                printMultipleTables(result, dimensions, printLatexTable)
+            assert len(dimensions) == 2, "This output is not available for sequences"
+            printMultipleTables(result, dimensions, printLatexTable)
         case _:
             raise Exception(f"Invalid type selected for printing: {output_type}")
 
