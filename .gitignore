@@ -2,3 +2,6 @@
 1-c
 .vscode/settings.json
 .DS_Store
+*.tex
+*.synctex*
+*.log

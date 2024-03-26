@@ -106,8 +106,11 @@ def printResults(output_type: OutputType, result, dimensions: list[str]):
             else:
                 printMultipleTables(result, dimensions, printAsciiTable)
         case OutputType.LATEX_TABLE:
-            assert len(dimensions) == 2, "This output is not available for sequences"
-            printMultipleTables(result, dimensions, printLatexTable)
+            assert len(dimensions) >= 2, "This output is not available for sequences"
+            from API.util.Latex import LatexTablePrinter
+            printer = LatexTablePrinter("out.tex")
+            printMultipleTables(result, dimensions, printer.writeTable)
+            printer.close()
         case _:
             raise Exception(f"Invalid type selected for printing: {output_type}")
 
