@@ -104,8 +104,10 @@ class Word:
 
         return runs
 
-    def getNumRuns(self):
-        return len(self.weak_runs)
+    def getNumRuns(self, weak = True):
+        if weak:
+            return len(self.weak_runs)
+        return len(self.getRuns(weak = False))
 
     """
     If weak_ascents is true consider runs to be weakly increasing. Otherwise strictly increasing.
@@ -148,6 +150,7 @@ if __name__ == "__main__":
     assert neg_b <= neg_a
     assert not a <= neg_b
 
+    # weak ascents/runs, weak flat
     unflat_word = Word([a, neg_a, b, b, neg_b]) # a | (-a)bb | (-b)
     flat_word = Word([neg_b, neg_a, b, neg_a, a, b, a]) # (-b)(-a)b | (-a)ab | a
 
@@ -168,3 +171,25 @@ if __name__ == "__main__":
     assert str(Word(flat_runs[0])) == "(-b)(-a)b"
     assert str(Word(flat_runs[1])) == "(-a)ab"
     assert str(Word(flat_runs[2])) == "a"
+
+    # strong ascents/runs, weak flat
+    # unflat_word = Word([a, neg_a, b, b, neg_b]) # a | (-a)b | b | (-b)
+    # flat_word = Word([neg_b, neg_a, b, neg_a, a, b, a]) # (-b)(-a)b | (-a)ab | a
+
+    # assert str(unflat_word) == "a(-a)bb(-b)"
+    # assert str(flat_word) == "(-b)(-a)b(-a)aba"
+
+    # assert not unflat_word.isFlattened()
+    # assert flat_word.isFlattened()
+
+    # unflat_runs = unflat_word.getRuns()
+    # assert len(unflat_runs) == 3
+    # assert str(Word(unflat_runs[0])) == "a"
+    # assert str(Word(unflat_runs[1])) == "(-a)bb"
+    # assert str(Word(unflat_runs[2])) == "(-b)"
+
+    # flat_runs = flat_word.getRuns()
+    # assert len(flat_runs) == 3
+    # assert str(Word(flat_runs[0])) == "(-b)(-a)b"
+    # assert str(Word(flat_runs[1])) == "(-a)ab"
+    # assert str(Word(flat_runs[2])) == "a"

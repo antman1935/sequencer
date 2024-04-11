@@ -39,7 +39,7 @@ class ParkingFunctionGeneratorCmd(Command):
     name: str = "parking_func"
     description: str = "Parking Functions"
     parameters: list[CommandParameter] = [
-        CommandParameter("n", True, ParamType.NATURAL, "The length of the string"),
+        CommandParameter("n", True, ParamType.INT_POS, "The length of the string"),
         CommandParameter("unit", False, ParamType.BOOL, "If true, only consider unit parking functions"),
         CommandParameter("r", False, ParamType.NATURAL, "First r elements of parking function must be distinct")
     ]

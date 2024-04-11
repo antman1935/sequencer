@@ -42,7 +42,7 @@ def printMultipleTables(result, dimensions: list[str], print_func):
     def helper(curr, i, idxs):
         if i == len(dimensions) - 2:
             label = ';'.join([dimensions[j] + '=' + str(idxs[j]) for j in range(len(idxs))])
-            row_bounds, column_bounds = getTableBounds(curr)
+            column_bounds, row_bounds = getTableBounds(curr)
             [row_dim, col_dim] = reversed(dimensions[i:])
             data = invert(curr)
             data = [[0 if c not in data[r] else data[r][c] for c in range(column_bounds[0], column_bounds[1] + 1)] for r in range(row_bounds[0], row_bounds[1] + 1)]
@@ -74,24 +74,21 @@ def printAsciiTable(label: str, row_bounds: tuple[int, int], row_dim: str, col_b
 
     dim_str = f"{row_dim} \\ {col_dim}"
 
-    column_widths = [max([len(str(data[r][c])) for r in range(row_bounds[0], row_bounds[1] + 1)]) for c in range(col_bounds[0], col_bounds[1] + 1)]
-    column_widths = [max(len(dim_str), max([len(str(r)) for r in range(row_bounds[0], row_bounds[1] + 1)]))] + [max(len(str(c)), cur) for c, cur in zip([c for c in range(col_bounds[0], col_bounds[1] + 1)], column_widths)]
+    column_widths = [max([len(str(data[r][c])) for r in range(0, row_bounds[1] + 1 - row_bounds[0])]) for c in range(0, col_bounds[1] + 1 - col_bounds[0])]
+    column_widths = [max(len(dim_str), max([len(str(r)) for r in range(0, row_bounds[1] + 1 - row_bounds[0])]))] + [max(len(str(c)), cur) for c, cur in zip([c for c in range(0, col_bounds[1] + 1 - col_bounds[0])], column_widths)]
 
     row_length = sum(column_widths) + 3 * len(column_widths) + 1
     print("-" * row_length)
     printAsciiRow([dim_str] + [c for c in range(col_bounds[0], col_bounds[1] + 1)], column_widths, print_zeros=True)
     print("|"+("-" * (row_length-2))+"|")
     for r, row in zip([r for r in range(row_bounds[0], row_bounds[1] + 1)], data):
-        if sum(row) == 0:
-            continue
+        # if sum(row) == 0:
+        #     continue
         printAsciiRow([r] + row, column_widths)
         if r != row_bounds[1]:
             print("|"+("-" * (row_length-2))+"|")
         else:
             print("-" * row_length)
-
-def printLatexTable(label: str, row_bounds: tuple[int, int], row_dim: str, col_bounds: tuple[int, int], col_dim: str, data: list[list[int]]):
-    print("You gotta know when to hold them... know when to fold them. KNow when to walk away. KNow hmm hmmm")
 
 def printResults(output_type: OutputType, result, dimensions: list[str]):
     match output_type:

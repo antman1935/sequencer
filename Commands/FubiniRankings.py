@@ -47,7 +47,7 @@ class FubiniGeneratorCmd(Command):
     name: str = "fubini"
     description: str = "Fubini Rankings"
     parameters: list[CommandParameter] = [
-        CommandParameter("n", True, ParamType.NATURAL, "The number of positions to give a rank."),
+        CommandParameter("n", True, ParamType.INT_POS, "The number of positions to give a rank."),
         CommandParameter("k", False, ParamType.INT_POS, "The maximum number of positions in an individual tie."),
         CommandParameter("t", False, ParamType.NATURAL, "The maximum number of ties."),
         CommandParameter("r", False, ParamType.INT_POS, "First r elements of ranking must be distinct"),

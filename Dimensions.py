@@ -1,6 +1,7 @@
 # author: antman1935, anthony.lamont99@yahoo.com
 
 from enum import Enum
+from WordStatistics import makeWord
 
 class DimensionType(Enum):
     PARAMETER = 1
@@ -37,9 +38,21 @@ def getMultiplicityG1Sum(word: list[int]):
         elms[elm] += 1
     return sum([value for _, value in elms.items() if value > 1])
 
+def getWeakRuns(word: list[int]):
+    w = makeWord(word)
+    return w.getNumRuns(weak=True)
+
+def getRuns(word: list[int]):
+    if len(word) == 7:
+        print(word)
+    w = makeWord(word)
+    return w.getNumRuns(weak=False)
+
 computed_dims = [
     DimensionComputation("mult_g_1", "Returns the number of elements in the word with multiplicity > 1", getMultiplicityG1Count),
     DimensionComputation("sum_mult_g_1", "Returns the sum of the multiplicity of the elements with multiplicity > 1", getMultiplicityG1Sum),
+    DimensionComputation("runs", "Returns the number of contiguous strictly increasing subsequences in the word.", getRuns),
+    DimensionComputation("weak_runs", "Returns the number of contiguous weakly increasing subsequences in the word.", getWeakRuns),
 ]
 
 for dim in computed_dims:
