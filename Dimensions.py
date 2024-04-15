@@ -43,8 +43,6 @@ def getWeakRuns(word: list[int]):
     return w.getNumRuns(weak=True)
 
 def getRuns(word: list[int]):
-    if len(word) == 7:
-        print(word)
     w = makeWord(word)
     return w.getNumRuns(weak=False)
 
