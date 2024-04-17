@@ -19,6 +19,12 @@ class Letter:
 
     def __repr__(self):
         return str(self)
+    
+    def __hash__(self):
+        return hash(str(self))
+    
+    def __sub__(self, other):
+        return self.char - other.char
 
     def __le__(self, other):
         if self.sign == other.sign:
@@ -41,6 +47,12 @@ class Letter:
             return (self.char < other.char) ^ (not self.sign)
         else:
             return not self.sign
+        
+    def __gt__(self, other):
+        return not (self <= other)
+    
+    def __ge__(self, other):
+        return not (self < other)
 
 """
 Represents a string of Letters and provides operations for getting the set
@@ -125,6 +137,12 @@ class Word:
                 return False
 
         return True
+    
+    def isPermutation(self):
+        letters = set()
+        for elm in self.letters:
+            letters.add(elm)
+        return (len(letters) == len(self.letters)) and (max(letters) - min(letters) + 1 == len(self.letters))
 
     def getRunType(self):
         return [len(run) for run in self.weak_runs]
