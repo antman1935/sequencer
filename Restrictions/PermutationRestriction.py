@@ -7,7 +7,6 @@ from WordStatistics import makeWord
 class PermutationRestriction(Restriction):
     name: str = "perm"
     description: str = "Can filter out words that are or are not permutations."
-    # TODO: delete if you have no parameters.
     parameters: list[CommandParameter] = [
         CommandParameter("is", False, ParamType.BOOL, "If true, filter our words that are not permutations. If false, filter out words that are permutations."),
     ]
