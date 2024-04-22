@@ -1,3 +1,13 @@
+from math import copysign, ceil
+
+def sign(x):
+    if x == 0:
+        return 0
+    return copysign(1.0, x)
+
+def signFromBool(b):
+    return 1 if b else -1
+
 """
 Represents an individual character along with a sign. Uses the inherent
 ordering on the type of self.char along with the implied ordering of the
@@ -24,7 +34,11 @@ class Letter:
         return hash(str(self))
     
     def __sub__(self, other):
-        return self.char - other.char
+        if type(self.char) is str:
+            left = signFromBool(self.sign) * (ord(self.char) - ord('a') + 1)
+            right = signFromBool(other.sign) * (ord(other.char) - ord('a') + 1)
+            return left - right
+        return signFromBool(self.sign) * self.char - signFromBool(other.sign) * other.char
 
     def __le__(self, other):
         if self.sign == other.sign:
@@ -53,6 +67,9 @@ class Letter:
     
     def __ge__(self, other):
         return not (self < other)
+    
+    def __eq__(self, other):
+        return self.sign == other.sign and self.char == other.char
 
 """
 Represents a string of Letters and provides operations for getting the set
@@ -120,6 +137,18 @@ class Word:
         if weak:
             return len(self.weak_runs)
         return len(self.getRuns(weak = False))
+    
+    """
+    For a word of length n, getDeltas returns an array of length n-1
+    where the value at position i is self.letters[i+1] - self.letters[i]
+    """
+    def getDeltas(self):
+        if len(self.letters) < 2:
+            return []
+        deltas = []
+        for i in range(0, len(self.letters)-1):
+            deltas.append(self.letters[i+1] - self.letters[i])
+        return deltas
 
     """
     If weak_ascents is true consider runs to be weakly increasing. Otherwise strictly increasing.
@@ -143,6 +172,63 @@ class Word:
         for elm in self.letters:
             letters.add(elm)
         return (len(letters) == len(self.letters)) and (max(letters) - min(letters) + 1 == len(self.letters))
+
+    
+    """
+    If the word is made of symmetric peaks and valleys, return a list containing those
+    symmetric peaks and valleys. If the word is not symmetric, then we return our attempt
+    at finding the symmetric peaks and valleys.
+    """
+    def getSymmetricPeaksAndValleys(self):
+        deltas = self.getDeltas()
+        segments = []
+        segment = [self.letters[0]]
+        segment_dir = []
+        peak_length = 1
+        i = 1
+        while i < len(self.letters):
+            s = sign(deltas[i-1])
+            # either segment is len 1, or direction is not changing
+            if len(segment_dir) == 0 or segment_dir[-1] == s:
+                segment.append(self.letters[i])
+                segment_dir.append(s)
+                i += 1
+            # if no change, then our peak/valley is longer than 1 elm
+            elif s == 0:
+                segment.append(self.letters[i])
+                peak_length += 1
+                i += 1
+            # changed direction, copy non-peak/valley elements
+            else:
+                tail_len = len(segment) - peak_length
+                tail = self.letters[i:min(i + tail_len, len(self.letters))]
+                segment = segment + tail
+                segments.append(segment)
+                segment = []
+                peak_length = 1
+                # reprime the loop
+                i = min(i + tail_len, len(self.letters))
+                if i < len(self.letters):
+                    segment = [self.letters[i]]
+                    segment_dir = []
+                    i += 1
+
+        if len(segment) > 0:
+            segments.append(segment)
+
+        return segments
+
+    """
+    Returns true if the word is made of symmetric peaks and valleys. It does this by calling
+    getSymmetricPeaksAndValleys and checking that each segment is a palindrome.
+    """
+    def isSymmetric(self):
+        segments = self.getSymmetricPeaksAndValleys()
+        for segment in segments:
+            for i in range(0, ceil(len(segment)/2.0)):
+                if segment[i] != segment[len(segment) - 1 - i]:
+                    return False
+        return True
 
     def getRunType(self):
         return [len(run) for run in self.weak_runs]
@@ -189,6 +275,18 @@ if __name__ == "__main__":
     assert str(Word(flat_runs[0])) == "(-b)(-a)b"
     assert str(Word(flat_runs[1])) == "(-a)ab"
     assert str(Word(flat_runs[2])) == "a"
+
+    symm_word = Word([a, neg_a, neg_a, a, neg_b, b, b, b, neg_b])
+    pavs = symm_word.getSymmetricPeaksAndValleys()
+    print(symm_word)
+    print(pavs)
+    assert len(pavs) == 2
+    assert pavs[0] == [a, neg_a, neg_a, a]
+    assert pavs[1] == [neg_b, b, b, b, neg_b]
+    assert symm_word.isSymmetric()
+    assert not unflat_word.isSymmetric()
+    assert not flat_word.isSymmetric()
+
 
     # strong ascents/runs, weak flat
     # unflat_word = Word([a, neg_a, b, b, neg_b]) # a | (-a)b | b | (-b)
