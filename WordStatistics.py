@@ -176,6 +176,7 @@ class Word:
     def getOverlappingSymmetricPeaksAndValleys(self):
         deltas = self.getDeltas()
         segments = []
+        peak_lengths = []
         segment = [self.letters[0]]
         segment_dir = []
         peak_length = 1
@@ -200,6 +201,7 @@ class Word:
                 tail = self.letters[i:min(i + tail_len, len(self.letters))]
                 segment = segment + tail
                 segments.append(segment)
+                peak_lengths.append(peak_length)
                 peak_length = 1
                 # reprime the loop
                 i = min(i + tail_len, len(self.letters))
@@ -220,7 +222,7 @@ class Word:
         if len(segment) > 0:
             segments.append(segment)
 
-        return segments
+        return segments, peak_lengths
 
     
     """
@@ -231,6 +233,7 @@ class Word:
     def getSymmetricPeaksAndValleys(self):
         deltas = self.getDeltas()
         segments = []
+        peak_lengths = []
         segment = [self.letters[0]]
         segment_dir = []
         peak_length = 1
@@ -253,6 +256,7 @@ class Word:
                 tail = self.letters[i:min(i + tail_len, len(self.letters))]
                 segment = segment + tail
                 segments.append(segment)
+                peak_lengths.append(peak_length)
                 segment = []
                 peak_length = 1
                 # reprime the loop
@@ -265,22 +269,26 @@ class Word:
         if len(segment) > 0:
             segments.append(segment)
 
-        return segments
+        return segments, peak_lengths
 
     """
     Returns true if the word is made of symmetric peaks and valleys. It does this by calling
     getSymmetricPeaksAndValleys and checking that each segment is a palindrome.
     """
-    def isSymmetric(self):
-        segments = self.getSymmetricPeaksAndValleys()
+    def isSymmetric(self, max_peak = None):
+        segments, peak_lengths = self.getSymmetricPeaksAndValleys()
+        if len(peak_lengths) == 0 or (max_peak is not None and max(peak_lengths) > max_peak):
+            return False
         for segment in segments:
             for i in range(0, ceil(len(segment)/2.0)):
                 if segment[i] != segment[len(segment) - 1 - i]:
                     return False
         return True
     
-    def isCompletelySymmetric(self):
-        segments = self.getOverlappingSymmetricPeaksAndValleys()
+    def isCompletelySymmetric(self, max_peak = None):
+        segments, peak_lengths = self.getOverlappingSymmetricPeaksAndValleys()
+        if len(peak_lengths) == 0 or (max_peak is not None and max(peak_lengths) > max_peak):
+            return False
         for segment in segments:
             for i in range(0, ceil(len(segment)/2.0)):
                 if segment[i] != segment[len(segment) - 1 - i]:
@@ -334,25 +342,29 @@ if __name__ == "__main__":
     assert str(Word(flat_runs[2])) == "a"
 
     symm_word = Word([a, neg_a, neg_a, a, neg_b, b, b, b, neg_b])
-    pavs = symm_word.getSymmetricPeaksAndValleys()
+    pavs, pls = symm_word.getSymmetricPeaksAndValleys()
     assert len(pavs) == 2
     assert pavs[0] == [a, neg_a, neg_a, a]
+    assert pls[0] == 2
     assert pavs[1] == [neg_b, b, b, b, neg_b]
+    assert pls[1] == 3
     assert symm_word.isSymmetric()
     assert not unflat_word.isSymmetric()
     assert not flat_word.isSymmetric()
 
     comp_symm_word = Word([a, neg_a, neg_b, neg_a, a, a, a, neg_a, neg_b, neg_b, neg_a, a])
-    pavs = comp_symm_word.getOverlappingSymmetricPeaksAndValleys()
+    pavs, pls = comp_symm_word.getOverlappingSymmetricPeaksAndValleys()
     assert len(pavs) == 3
     assert pavs[0] == [a, neg_a, neg_b, neg_a, a]
+    assert pls[0] == 1
     assert pavs[1] == [neg_b, neg_a, a, a, a, neg_a, neg_b]
+    assert pls[1] == 3
     assert pavs[2] == [a, neg_a, neg_b, neg_b, neg_a, a]
+    assert pls[2] == 2
     assert comp_symm_word.isCompletelySymmetric()
     assert not symm_word.isCompletelySymmetric()
     assert not unflat_word.isCompletelySymmetric()
     assert not flat_word.isCompletelySymmetric()
-
 
     # strong ascents/runs, weak flat
     # unflat_word = Word([a, neg_a, b, b, neg_b]) # a | (-a)b | b | (-b)
