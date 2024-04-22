@@ -2,7 +2,7 @@ from math import copysign, ceil
 
 def sign(x):
     if x == 0:
-        return 0
+        return 0.0
     return copysign(1.0, x)
 
 def signFromBool(b):
@@ -172,6 +172,55 @@ class Word:
         for elm in self.letters:
             letters.add(elm)
         return (len(letters) == len(self.letters)) and (max(letters) - min(letters) + 1 == len(self.letters))
+    
+    def getOverlappingSymmetricPeaksAndValleys(self):
+        deltas = self.getDeltas()
+        segments = []
+        segment = [self.letters[0]]
+        segment_dir = []
+        peak_length = 1
+        i = 1
+        while i < len(self.letters):
+            s = sign(deltas[i-1])
+            # either segment is len 1, or direction is not changing
+            if len(segment_dir) == 0 or segment_dir[-1] == s:
+                segment.append(self.letters[i])
+                segment_dir.append(s)
+                i += 1
+                if s == 0:
+                    peak_length += 1
+            # if no change, then our peak/valley is longer than 1 elm
+            elif s == 0:
+                segment.append(self.letters[i])
+                peak_length += 1
+                i += 1
+            # changed direction, copy non-peak/valley elements
+            else:
+                tail_len = len(segment) - peak_length
+                tail = self.letters[i:min(i + tail_len, len(self.letters))]
+                segment = segment + tail
+                segments.append(segment)
+                peak_length = 1
+                # reprime the loop
+                i = min(i + tail_len, len(self.letters))
+                if i < len(self.letters):
+                    s = sign(deltas[i-1])
+                    if s == segment_dir[-1] or s == 0:
+                        segment = [segment[len(segment) - tail_len - 1]] + tail + [self.letters[i]]
+                        if s == 0:
+                            peak_length += 1
+                    else:
+                        segment = [self.letters[i-1], self.letters[i]]
+                    segment_dir = [deltas[i-1]]
+                    i += 1
+                else:
+                    segment = []
+
+
+        if len(segment) > 0:
+            segments.append(segment)
+
+        return segments
 
     
     """
@@ -229,6 +278,14 @@ class Word:
                 if segment[i] != segment[len(segment) - 1 - i]:
                     return False
         return True
+    
+    def isCompletelySymmetric(self):
+        segments = self.getOverlappingSymmetricPeaksAndValleys()
+        for segment in segments:
+            for i in range(0, ceil(len(segment)/2.0)):
+                if segment[i] != segment[len(segment) - 1 - i]:
+                    return False
+        return True
 
     def getRunType(self):
         return [len(run) for run in self.weak_runs]
@@ -278,14 +335,23 @@ if __name__ == "__main__":
 
     symm_word = Word([a, neg_a, neg_a, a, neg_b, b, b, b, neg_b])
     pavs = symm_word.getSymmetricPeaksAndValleys()
-    print(symm_word)
-    print(pavs)
     assert len(pavs) == 2
     assert pavs[0] == [a, neg_a, neg_a, a]
     assert pavs[1] == [neg_b, b, b, b, neg_b]
     assert symm_word.isSymmetric()
     assert not unflat_word.isSymmetric()
     assert not flat_word.isSymmetric()
+
+    comp_symm_word = Word([a, neg_a, neg_b, neg_a, a, a, a, neg_a, neg_b, neg_b, neg_a, a])
+    pavs = comp_symm_word.getOverlappingSymmetricPeaksAndValleys()
+    assert len(pavs) == 3
+    assert pavs[0] == [a, neg_a, neg_b, neg_a, a]
+    assert pavs[1] == [neg_b, neg_a, a, a, a, neg_a, neg_b]
+    assert pavs[2] == [a, neg_a, neg_b, neg_b, neg_a, a]
+    assert comp_symm_word.isCompletelySymmetric()
+    assert not symm_word.isCompletelySymmetric()
+    assert not unflat_word.isCompletelySymmetric()
+    assert not flat_word.isCompletelySymmetric()
 
 
     # strong ascents/runs, weak flat
