@@ -5,7 +5,7 @@ from Parameters import CommandParameter, ParamType, CommandParser, OutputType
 from CmdTools import Command
 from Dimensions import DimensionType
 
-def increment(num_dict, indices):
+def increment(num_dict, indices, val):
     level = num_dict
     for i in range(len(indices) - 1):
         if indices[i] not in level:
@@ -14,7 +14,7 @@ def increment(num_dict, indices):
 
     if not indices[-1] in level:
         level[indices[-1]] = 0
-    level[indices[-1]] += 1
+    level[indices[-1]] += val
 
 def invert(d: dict[int, dict[int, int]]):
     new_d = {}
@@ -161,7 +161,7 @@ class RangeAPI(SequencerAPI):
                     print(indent*'\t', f"{word}{suffix}")
 
 
-                increment(count, indices)
+                increment(count, indices, 1 if self.stat is None else self.stat.calc(word))
             return
         
         ranged_param = ranged_params[rp_index]

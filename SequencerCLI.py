@@ -4,6 +4,7 @@ import sys, getopt
 from SequencerAPI import SequencerAPI
 from Restriction import Restriction
 from CmdTools import Command
+from Statistic import Statistic
 import Commands.CommandRegistration # registers all commands
 
 def main(argv):
@@ -12,13 +13,14 @@ def main(argv):
     api_params = None
     command = None
     command_params = None
+    stat = None
     restriction_list = []
     help_requested = False
 
     try:
-        opts, args = getopt.getopt(argv,"ha:c:r:",["api=", "command=", "restrictions="])
+        opts, args = getopt.getopt(argv,"ha:c:r:s:",["api=", "command=", "restrictions=", 'stat='])
     except getopt.GetoptError:
-        print(f"usage: SequencerCLI.py -a api_name/api_arguments -c command/command_arguments -r restrictions_list")
+        print(f"usage: SequencerCLI.py -a api_name/api_arguments -c command/command_arguments -r restrictions_list [-s stat]")
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
@@ -39,6 +41,12 @@ def main(argv):
             for res_token in res_tokens:
                 res.append(Restriction.parse(res_token))
             restriction_list.append(res)
+        elif opt in ["-s", "--stat"]:
+            print(arg)
+            stat_args = arg.split("/")
+            stat_name = stat_args[0].lower()
+            stat = Statistic.statistics[stat_name]()
+            stat.parseParameters("/".join(stat_args[1:]))
 
     if help_requested:
         print(usage_string)
@@ -94,6 +102,7 @@ def main(argv):
     cmd_inst.setRestrictions(restriction_list)
     
     api_inst.setCommand(cmd_inst)
+    api_inst.setStatistic(stat)
     api_inst.execute()
             
 

@@ -24,7 +24,7 @@ class PointAPI(SequencerAPI):
             print("Elements:")
         count = 0
         for word in self.cmd.generator():
-            count += 1
+            count += 1 if self.stat is None else self.stat.calc(word)
             if self.print:
                 print(f"\t{word}")
         print(f"|{self.cmd}| = {count}")
