@@ -3,7 +3,7 @@
 from SequencerAPI import SequencerAPI
 from Parameters import CommandParameter, ParamType, CommandParser, OutputType
 from CmdTools import Command
-from Dimensions import DimensionType
+from Statistic import DimensionType, Statistic
 
 def increment(num_dict, indices, val):
     level = num_dict
@@ -154,7 +154,8 @@ class RangeAPI(SequencerAPI):
                         case DimensionType.PARAMETER:
                             indices.append(inst[dim.name])
                         case DimensionType.COMPUTED:
-                            val = dim.compute(word)
+                            dim_stat = Statistic.statistics[dim.name]()
+                            val = dim_stat.calc(word)
                             indices.append(val)
                             comps.append(f"{dim.name}={val}")
                 if self.print:

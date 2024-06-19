@@ -1,6 +1,5 @@
 from enum import Enum, StrEnum
-from Dimensions import ComputedDimension, ParameterDimension
-
+from Statistic import Dimension, DimensionType
 class OutputType(Enum):
     OEIS_LOOKUP = 1
     RAW = 2
@@ -53,9 +52,9 @@ class ParamType(StrEnum):
                     assert len(tokens) == 2, f"Invalid parameter type provided: {token}"
                     [name, dim_type] = tokens
                     if dim_type in ["p", "param", "parameter"]:
-                        dim_list.append(ParameterDimension(name))
+                        dim_list.append(Dimension(DimensionType.PARAMETER, name))
                     elif dim_type in ["c", "comp", "computed"]:
-                        dim_list.append(ComputedDimension(name))
+                        dim_list.append(Dimension(DimensionType.COMPUTED, name))
                     else:
                         assert False, "Value is not in the list of acceptable dimension types."
                 return dim_list
