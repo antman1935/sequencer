@@ -38,6 +38,8 @@ those parameters.
 class StirlingGeneratorCmd(Command):
     name: str = "stirling"
     description: str = "Stirling Permutations"
+    ui_name: str = description
+    ui_description: str = "Stirling permutation are permutations on the multiset {1, 1, 2, 2, ..., n, n} so that for all i < n, all numbers between the two instances of i are greater than i."
     parameters: list[CommandParameter] = [
         CommandParameter("n", True, ParamType.NATURAL, "The maximum value for our permutation."),
         CommandParameter("k", False, ParamType.INT_POS, "The multiplicity of each number."),

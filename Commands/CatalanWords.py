@@ -35,6 +35,8 @@ those parameters.
 class CatalanGeneratorCmd(Command):
     name: str = "catalan"
     description: str = "Catalan Words"
+    ui_name: str = description
+    ui_description: str = "Catalan words of size n are equivalent to balanced strings of length 2n of parentheses."
     parameters: list[CommandParameter] = [
         CommandParameter("n", True, ParamType.NATURAL, "The length of the string"),
     ]

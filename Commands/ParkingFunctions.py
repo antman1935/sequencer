@@ -38,6 +38,8 @@ those parameters.
 class ParkingFunctionGeneratorCmd(Command):
     name: str = "parking_func"
     description: str = "Parking Functions"
+    ui_name: str = description
+    ui_description: str = "Parking functions are n-tuples of parking spot preferences such that when cars are allowed to park in the order of the tuple, and choose the next available spot if their choice is unavailable, all cars park successfully."
     parameters: list[CommandParameter] = [
         CommandParameter("n", True, ParamType.INT_POS, "The length of the string"),
         CommandParameter("unit", False, ParamType.BOOL, "If true, only consider unit parking functions"),

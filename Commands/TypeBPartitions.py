@@ -35,6 +35,8 @@ those parameters.
 class TypeBPartitionGeneratorCmd(Command):
     name: str = "type_b"
     description: str = "Type B Partitions"
+    ui_name: str = description
+    ui_description: str = "Type B partitions are partitions of the set {-n, ..., 0, ..., n} where for every P in the partition, the set -P is also in the partition, and there is only one set where P = -P."
     parameters: list[CommandParameter] = [
         CommandParameter("n", True, ParamType.NATURAL, "The max value of symmetric set {-n,...,0,...,n}"),
     ]

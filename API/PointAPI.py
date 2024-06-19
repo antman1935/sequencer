@@ -6,6 +6,7 @@ from Parameters import CommandParameter, ParamType, CommandParser, OutputType
 class PointAPI(SequencerAPI):
     name: str = "point"
     description: str = "Generate the set of objects for one set of parameters."
+    ui_name: str = "Point"
     parameters: list[CommandParameter] = [
         CommandParameter("p", False, ParamType.BOOL, "Whether to print the list of items."),
     ]
