@@ -1,0 +1,16 @@
+module templates
+singleton Constants 1.0 Constants.qml
+BooleanParameter 1.0 BooleanParameter.qml
+ColumnLoader 1.0 ColumnLoader.qml
+ListPick 1.0 ListPick.qml
+NameDesc 1.0 NameDesc.qml
+NameDescDel 1.0 NameDescDel.qml
+NameDescClick 1.0 NameDescClick.qml
+OptionList 1.0 OptionList.qml
+OptionListItem 1.0 OptionListItem.qml
+OptionSets 1.0 OptionSets.qml
+ParameterScroll 1.0 ParameterScroll.qml
+ParameterSet 1.0 ParameterSet.qml
+StringParameter 1.0 StringParameter.qml
+ClickAndScroll 1.0 ClickAndScroll.qml
+ScrollLoader 1.0 ScrollLoader.qml
