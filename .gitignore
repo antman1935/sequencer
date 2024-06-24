@@ -5,3 +5,4 @@
 *.tex
 *.synctex*
 *.log
+UI/qml/test.qml
