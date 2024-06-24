@@ -114,7 +114,7 @@ def printResults(output_type: OutputType, result, dimensions: list[str]):
 
 class RangeAPI(SequencerAPI):
     name: str = "range"
-    description: str = "Create a sequence or series of tables based on the selected fields to group by."
+    description: str = "Create a sequence or series of tables based on the selected dimensions to group by."
     ui_name: str = "Range"
     parameters: list[CommandParameter] = [
         CommandParameter("dimensions", True, ParamType.LIST_DIM, "List of dimensions to create our sequence or table(s)"),

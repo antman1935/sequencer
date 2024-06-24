@@ -7,6 +7,8 @@ from WordStatistics import makeWord
 class PeakRestriction(Restriction):
     name: str = "peaks"
     description: str = "Only accepts word whose peaks match the given peakset."
+    ui_name: str = "Peaks"
+    ui_description: str = description
     parameters: list[CommandParameter] = [
         CommandParameter("peaks", True, ParamType.LIST_INT_POS, "The list of 1-indexed peak indices."),
     ]

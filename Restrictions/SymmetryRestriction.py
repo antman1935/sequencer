@@ -7,10 +7,12 @@ from WordStatistics import makeWord
 class SymmetryRestriction(Restriction):
     name: str = "symmetric"
     description: str = "Omits elements that are not symmetric."
+    ui_name: str = "Symmetric"
+    ui_description: str = description
     parameters: list[CommandParameter] = [
         CommandParameter("total", False, ParamType.BOOL, "If false, the word must be piecewise symmetric. Otherwise, the entire word must be symmetric."),
         CommandParameter("is", False, ParamType.BOOL, "If true, filter our words that are not symmetric. If false, filter out words that are symmetric."),
-        CommandParameter("peak_length", False, ParamType.INT_POS, "Maximum length of a peak to consider symmetric."),
+        CommandParameter("peak_length", False, ParamType.INT_POS, "Maximum length of a peak (or valley) to consider symmetric."),
     ]
     parser: CommandParser = CommandParser(parameters)
 

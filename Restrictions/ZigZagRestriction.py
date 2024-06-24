@@ -6,6 +6,8 @@ from Restriction import Restriction, CacheKeys
 class ZigZagRestriction(Restriction):
     name: str = "zigzag"
     description: str = "Omits elements with subsequences (length > 1) of constant chars."
+    ui_name: str = "ZigZag"
+    ui_description: str = description
     parameters: list[CommandParameter] = [
         CommandParameter("is", False, ParamType.BOOL, "If true, filter our words that are not zigzag. If false, filter out words that are zigzag."),
     ]

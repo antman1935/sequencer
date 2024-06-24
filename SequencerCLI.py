@@ -7,6 +7,28 @@ from CmdTools import Command
 from Statistic import Statistic
 import Commands.CommandRegistration # registers all commands
 
+def api_check():
+    for _, api in SequencerAPI.apis.items():
+        assert not "," in api.name, f"Cannot have ',' in API name: {api.name}"
+        assert not "-" in api.name, f"Cannot have '-' in API name: {api.name}"
+
+    for _, cmd in Command.commands.items():
+        assert not "," in cmd.name, f"Cannot have ',' in command name: {cmd.name}"
+        assert not "-" in cmd.name, f"Cannot have '-' in command name: {cmd.name}"
+
+        for param in cmd.parameters:
+            assert not "," in param.name, f"Cannot have ',' in command parameter name: {cmd.name} - {param.name}"
+            assert not "-" in param.name, f"Cannot have '-' in command parameter name: {cmd.name} - {param.name}"
+
+    for _, res in Restriction.restrictions.items():
+        assert not "," in res.name, f"Cannot have ',' in command name: {res.name}"
+        assert not "-" in res.name, f"Cannot have '-' in command name: {res.name}"
+
+        for param in res.parameters:
+            assert not "," in param.name, f"Cannot have ',' in parameter name: {res.name} - {param.name}"
+            assert not "-" in param.name, f"Cannot have '-' in parameter name: {res.name} - {param.name}"
+    
+
 def main(argv):
     usage_string = "usage: SequencerCLI.py -a api_name/api_arguments -c command/command_arguments (-r restrictions_list)*"
     api = None
@@ -16,6 +38,8 @@ def main(argv):
     stat = None
     restriction_list = []
     help_requested = False
+
+    api_check()
 
     try:
         opts, args = getopt.getopt(argv,"ha:c:r:s:",["api=", "command=", "restrictions=", 'stat='])

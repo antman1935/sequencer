@@ -6,6 +6,8 @@ from Restriction import Restriction, CacheKeys
 class ParksRestriction(Restriction):
     name: str = "parks"
     description: str = "Omit words that are not valid parking functions."
+    ui_name: str = "Parks"
+    ui_description: str = description
     parameters = []
 
     def parseParameters(self, params: str):

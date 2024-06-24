@@ -47,7 +47,7 @@ class FubiniGeneratorCmd(Command):
     name: str = "fubini"
     description: str = "Fubini Rankings"
     ui_name: str = description
-    ui_description: str = "Fubini rankings are rankings of n competitors so that if j competitors take spot i, then the next highest ranking must be rank i + j."
+    ui_description: str = "Fubini rankings are rankings of n competitors so that if j competitors take spot i, then the next ranking in increasing order must be rank i + j."
     parameters: list[CommandParameter] = [
         CommandParameter("k", False, ParamType.INT_POS, "The maximum number of positions in an individual tie."),
         CommandParameter("n", True, ParamType.INT_POS, "The number of positions to give a rank."),

@@ -7,6 +7,8 @@ from WordStatistics import makeWord
 class FlatRestriction(Restriction):
     name: str = "flat"
     description: str = "Only accepts flat words."
+    ui_name: str = "Flat"
+    ui_description: str = "Only accepts words that when broken down into runs - maximmal increasing subsequences - the leadings terms of the runs are increasing order."
     parameters: list[CommandParameter] = [
         CommandParameter("weak_ascents", False, ParamType.BOOL, "If true, runs use weak inequality for ascents. If false, runs use strict inequality for ascents."),
         CommandParameter("weak_flat", False, ParamType.BOOL, "If true, omit words where run starts are not weakly increasing. If false, omit words where run starts are not strictly increasing."),
