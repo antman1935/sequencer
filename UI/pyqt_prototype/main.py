@@ -12,14 +12,13 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QFrame,
-    QFormLayout,
-    QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QMainWindow,
     QMessageBox,
     QPushButton,
+    QScrollArea,
     QSizePolicy,
     QSpinBox,
     QTextEdit,
@@ -34,84 +33,102 @@ from UI.pyqt_prototype.runner import coerce_value, execute_point_query
 
 
 APP_STYLE = """
-QWidget {
-    background: #f5f7fb;
-    color: #182233;
-    font-family: Inter, SF Pro Display, Segoe UI, Arial, sans-serif;
-    font-size: 14px;
-}
-QLabel#eyebrow {
-    color: #5b6b82;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1.6px;
-    text-transform: uppercase;
-}
-QLabel#title {
-    color: #101828;
-    font-size: 30px;
-    font-weight: 800;
-}
-QLabel#subtitle {
-    color: #5b6b82;
-    font-size: 14px;
-}
-QLabel#sectionTitle {
-    color: #101828;
-    font-size: 18px;
-    font-weight: 750;
-}
-QLabel#fieldHint {
-    color: #667085;
-    font-size: 12px;
+QMainWindow, QWidget#appRoot {
+    background: #f6f8fc;
+    color: #172033;
 }
 QFrame#card {
     background: #ffffff;
-    border: 1px solid #d9e2ef;
-    border-radius: 18px;
+    border: 1px solid #d7dfeb;
+    border-radius: 14px;
+}
+QWidget#cardBody, QWidget#parameterList, QWidget#parameterRow, QWidget#fieldBlock {
+    background: transparent;
+}
+QLabel {
+    background: transparent;
+    color: #172033;
+}
+QLabel#eyebrow {
+    color: #53627a;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+}
+QLabel#title {
+    color: #0f172a;
+    font-size: 26px;
+    font-weight: 800;
+}
+QLabel#subtitle, QLabel#helpText, QLabel#statusText {
+    color: #53627a;
+    font-size: 13px;
+}
+QLabel#sectionTitle {
+    color: #0f172a;
+    font-size: 17px;
+    font-weight: 750;
+}
+QLabel#fieldLabel {
+    color: #111827;
+    font-size: 13px;
+    font-weight: 750;
+}
+QLabel#fieldHint {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 145%;
 }
 QComboBox, QLineEdit, QSpinBox {
     background: #ffffff;
-    border: 1px solid #cfd8e6;
-    border-radius: 10px;
-    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    color: #111827;
+    padding: 7px 10px;
     min-height: 28px;
+    selection-background-color: #dbeafe;
 }
 QComboBox:focus, QLineEdit:focus, QSpinBox:focus {
-    border: 1px solid #4f7cff;
+    border: 1px solid #2563eb;
 }
 QCheckBox {
-    spacing: 10px;
-    color: #344054;
+    background: transparent;
+    color: #334155;
+    spacing: 9px;
 }
 QCheckBox::indicator {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
 }
 QPushButton {
-    background: #315efb;
+    background: #2563eb;
     border: none;
-    border-radius: 12px;
-    color: white;
-    font-size: 15px;
-    font-weight: 700;
-    padding: 12px 18px;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 750;
+    min-height: 42px;
+    padding: 0 18px;
 }
 QPushButton:hover {
-    background: #244ddd;
+    background: #1d4ed8;
 }
 QPushButton:pressed {
-    background: #1c3fb7;
+    background: #1e40af;
 }
 QPushButton:disabled {
-    background: #98a2b3;
+    background: #94a3b8;
+}
+QScrollArea {
+    background: transparent;
+    border: none;
 }
 QTextEdit {
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    border-radius: 16px;
-    color: #dbeafe;
-    font-family: JetBrains Mono, SF Mono, Consolas, monospace;
+    background: #111827;
+    border: 1px solid #0f172a;
+    border-radius: 12px;
+    color: #e5e7eb;
+    font-family: SF Mono, Menlo, Consolas, monospace;
     font-size: 13px;
     padding: 14px;
 }
@@ -145,25 +162,27 @@ class QueryWorker(QRunnable):
 class GeneratedParameterForm(QWidget):
     def __init__(self):
         super().__init__()
-        self.layout = QFormLayout(self)
+        self.setObjectName("parameterList")
+        self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setHorizontalSpacing(22)
-        self.layout.setVerticalSpacing(16)
-        self.layout.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
+        self.layout.setSpacing(12)
         self.command_name = None
         self.editors = {}
 
     def set_command(self, command_name):
         self.command_name = command_name
         self.editors = {}
-        while self.layout.rowCount():
-            self.layout.removeRow(0)
+        while self.layout.count():
+            item = self.layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
 
         command_class = Command.commands[command_name]
         for parameter in sorted(command_class.parameters, key=lambda p: not p.required):
             editor = self._make_editor(parameter)
-            self.layout.addRow(self._make_label(parameter), editor)
+            self.layout.addWidget(self._make_parameter_row(parameter, editor))
             self.editors[parameter.name] = (parameter, editor)
+        self.layout.addStretch(1)
 
     def values(self):
         result = {}
@@ -175,20 +194,25 @@ class GeneratedParameterForm(QWidget):
                 result[name] = value
         return result
 
-    def _make_label(self, parameter):
-        wrapper = QWidget()
-        layout = QVBoxLayout(wrapper)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(2)
+    def _make_parameter_row(self, parameter, editor):
+        row = QFrame()
+        row.setObjectName("parameterRow")
+        row.setFrameShape(QFrame.NoFrame)
+        row_layout = QVBoxLayout(row)
+        row_layout.setContentsMargins(0, 0, 0, 0)
+        row_layout.setSpacing(6)
 
-        name = QLabel(parameter.name + ("  *" if parameter.required else ""))
-        name.setStyleSheet("font-weight: 700; color: #243047;")
+        label = QLabel(parameter.name + ("  *" if parameter.required else ""))
+        label.setObjectName("fieldLabel")
         hint = QLabel(parameter.description or "Optional value")
         hint.setObjectName("fieldHint")
         hint.setWordWrap(True)
-        layout.addWidget(name)
-        layout.addWidget(hint)
-        return wrapper
+        hint.setMinimumHeight(30)
+
+        row_layout.addWidget(label)
+        row_layout.addWidget(hint)
+        row_layout.addWidget(editor)
+        return row
 
     def _make_editor(self, parameter):
         match parameter.param_type:
@@ -210,7 +234,7 @@ class GeneratedParameterForm(QWidget):
                 editor = QLineEdit()
                 editor.setPlaceholderText(parameter.description)
         editor.setToolTip(parameter.description)
-        editor.setMinimumWidth(280)
+        editor.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         return editor
 
     def _editor_value(self, parameter, editor):
@@ -247,15 +271,16 @@ class SequencerPrototypeWindow(QMainWindow):
         self.output.setPlaceholderText("Run a query to see results here.")
         self.run_button = QPushButton("Run point query")
         self.status = QLabel("Ready")
-        self.status.setObjectName("fieldHint")
+        self.status.setObjectName("statusText")
 
-        central = QWidget()
-        shell = QVBoxLayout(central)
-        shell.setContentsMargins(28, 26, 28, 28)
-        shell.setSpacing(20)
+        root = QWidget()
+        root.setObjectName("appRoot")
+        shell = QVBoxLayout(root)
+        shell.setContentsMargins(28, 24, 28, 28)
+        shell.setSpacing(18)
         shell.addLayout(self._make_header())
         shell.addLayout(self._make_body(), 1)
-        self.setCentralWidget(central)
+        self.setCentralWidget(root)
 
         self.command_picker.currentIndexChanged.connect(self.refresh_form)
         self.run_button.clicked.connect(self.run_query)
@@ -276,30 +301,28 @@ class SequencerPrototypeWindow(QMainWindow):
         return layout
 
     def _make_body(self):
-        layout = QGridLayout()
-        layout.setHorizontalSpacing(20)
-        layout.setVerticalSpacing(20)
-        layout.addWidget(self._make_query_card(), 0, 0)
-        layout.addWidget(self._make_result_card(), 0, 1)
-        layout.setColumnStretch(0, 1)
-        layout.setColumnStretch(1, 2)
+        layout = QHBoxLayout()
+        layout.setSpacing(18)
+        layout.addWidget(self._make_query_card())
+        layout.addWidget(self._make_result_card(), 1)
         return layout
 
     def _make_query_card(self):
-        card, layout = self._card("Query setup", "Choose an object, select an optional statistic, then fill in the generated parameters.")
+        card, layout = self._card("Query setup", "Choose an object, optional statistic, and generated parameters.")
+        card.setFixedWidth(430)
 
-        pickers = QFormLayout()
-        pickers.setContentsMargins(0, 0, 0, 0)
-        pickers.setHorizontalSpacing(16)
-        pickers.setVerticalSpacing(14)
-        pickers.addRow("Object", self.command_picker)
-        pickers.addRow("Statistic", self.statistic_picker)
-        layout.addLayout(pickers)
-        layout.addSpacing(8)
-        layout.addWidget(self.form)
+        layout.addWidget(self._make_field_block("Object", self.command_picker))
+        layout.addWidget(self._make_field_block("Statistic", self.statistic_picker))
         layout.addSpacing(4)
+
+        scroller = QScrollArea()
+        scroller.setWidgetResizable(True)
+        scroller.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroller.setWidget(self.form)
+        scroller.setMinimumHeight(260)
+        layout.addWidget(scroller, 1)
+
         layout.addWidget(self.print_elements)
-        layout.addStretch(1)
         layout.addWidget(self.run_button)
         layout.addWidget(self.status)
         return card
@@ -310,16 +333,28 @@ class SequencerPrototypeWindow(QMainWindow):
         layout.addWidget(self.output, 1)
         return card
 
+    def _make_field_block(self, label_text, editor):
+        block = QWidget()
+        block.setObjectName("fieldBlock")
+        layout = QVBoxLayout(block)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(6)
+        label = QLabel(label_text)
+        label.setObjectName("fieldLabel")
+        layout.addWidget(label)
+        layout.addWidget(editor)
+        return block
+
     def _card(self, title, subtitle):
         card = QFrame()
         card.setObjectName("card")
         layout = QVBoxLayout(card)
-        layout.setContentsMargins(22, 22, 22, 22)
-        layout.setSpacing(14)
+        layout.setContentsMargins(22, 20, 22, 20)
+        layout.setSpacing(13)
         title_label = QLabel(title)
         title_label.setObjectName("sectionTitle")
         subtitle_label = QLabel(subtitle)
-        subtitle_label.setObjectName("subtitle")
+        subtitle_label.setObjectName("helpText")
         subtitle_label.setWordWrap(True)
         layout.addWidget(title_label)
         layout.addWidget(subtitle_label)
@@ -366,8 +401,9 @@ class SequencerPrototypeWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
+    app.setStyle("Fusion")
     app.setStyleSheet(APP_STYLE)
-    app.setFont(QFont("Inter", 10))
+    app.setFont(QFont("Arial", 10))
     window = SequencerPrototypeWindow()
     window.resize(1180, 760)
     window.show()

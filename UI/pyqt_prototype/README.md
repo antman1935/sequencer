@@ -12,9 +12,15 @@ python3 -m venv .venv
 
 ## Visual preview
 
-Open `UI/pyqt_prototype/prototype_mockup.svg` to see the intended layout.
+Open `UI/pyqt_prototype/prototype_mockup.svg` to see the current polished layout preview.
 
-The sandbox used to build this prototype could install PySide6 in `.venv`, but could not install the missing system OpenGL runtime (`libGL.so.1`), so the native Qt window could not be screenshotted here.
+To capture the native Qt window locally:
+
+```bash
+.venv/bin/python UI/pyqt_prototype/capture_screenshot.py
+```
+
+That writes `UI/pyqt_prototype/screenshot.png`.
 
 ## Design difference
 
