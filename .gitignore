@@ -6,3 +6,6 @@
 *.synctex*
 *.log
 UI/qml/test.qml
+node_modules/
+__pycache__/
+.venv/

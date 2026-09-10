@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="760" viewBox="0 0 1180 760">
+  <rect width="100%" height="100%" fill="#f6f8fc"/>
+  <text x="28" y="38" fill="#53627a" font-family="Arial" font-size="12" font-weight="700" letter-spacing="1.4">SEQUENCER PROTOTYPE</text>
+  <text x="28" y="73" fill="#0f172a" font-family="Arial" font-size="26" font-weight="800">Build mathematical queries directly from Python metadata</text>
+  <text x="28" y="102" fill="#53627a" font-family="Arial" font-size="13">A cleaner Qt Widgets direction before expanding coverage beyond point queries.</text>
+  <rect x="28" y="126" width="430" height="606" rx="14" fill="#ffffff" stroke="#d7dfeb"/>
+  <rect x="476" y="126" width="676" height="606" rx="14" fill="#ffffff" stroke="#d7dfeb"/>
+  <text x="50" y="165" fill="#0f172a" font-family="Arial" font-size="17" font-weight="750">Query setup</text>
+  <text x="50" y="194" fill="#53627a" font-family="Arial" font-size="13">Choose an object, optional statistic, and generated parameters.</text>
+  <text x="50" y="233" fill="#111827" font-family="Arial" font-size="13" font-weight="750">Object</text>
+  <rect x="50" y="246" width="386" height="44" rx="8" fill="#fff" stroke="#cbd5e1"/>
+  <text x="62" y="274" fill="#111827" font-family="Arial" font-size="14">Fubini Rankings</text>
+  <text x="50" y="323" fill="#111827" font-family="Arial" font-size="13" font-weight="750">Statistic</text>
+  <rect x="50" y="336" width="386" height="44" rx="8" fill="#fff" stroke="#cbd5e1"/>
+  <text x="62" y="364" fill="#111827" font-family="Arial" font-size="14">Count objects</text>
+  <text x="50" y="417" fill="#111827" font-family="Arial" font-size="13" font-weight="750">n *</text>
+  <text x="50" y="440" fill="#64748b" font-family="Arial" font-size="12">length of the ranking</text>
+  <rect x="50" y="453" width="386" height="44" rx="8" fill="#fff" stroke="#cbd5e1"/>
+  <text x="62" y="481" fill="#111827" font-family="Arial" font-size="14">1</text>
+  <text x="50" y="536" fill="#111827" font-family="Arial" font-size="13" font-weight="750">k</text>
+  <text x="50" y="559" fill="#64748b" font-family="Arial" font-size="12">number of blocks</text>
+  <rect x="50" y="572" width="386" height="44" rx="8" fill="#fff" stroke="#cbd5e1"/>
+  <text x="62" y="600" fill="#111827" font-family="Arial" font-size="14">unset</text>
+  <rect x="50" y="648" width="16" height="16" rx="3" fill="#fff" stroke="#94a3b8"/>
+  <text x="75" y="661" fill="#334155" font-family="Arial" font-size="14">Show generated elements</text>
+  <rect x="50" y="680" width="386" height="42" rx="10" fill="#2563eb"/>
+  <text x="190" y="706" fill="#fff" font-family="Arial" font-size="14" font-weight="750">Run point query</text>
+  <text x="498" y="165" fill="#0f172a" font-family="Arial" font-size="17" font-weight="750">Result</text>
+  <text x="498" y="194" fill="#53627a" font-family="Arial" font-size="13">Captured command output appears here without freezing the interface.</text>
+  <rect x="498" y="216" width="632" height="490" rx="12" fill="#111827" stroke="#0f172a"/>
+  <text x="516" y="250" fill="#93a4c7" font-family="Menlo, Consolas, monospace" font-size="13">Run a query to see results here.</text>
+  <text x="516" y="308" fill="#e5e7eb" font-family="Menlo, Consolas, monospace" font-size="13">Example: Point Query on Fubini Rankings.</text>
+</svg>

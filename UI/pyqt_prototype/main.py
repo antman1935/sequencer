@@ -30,109 +30,7 @@ from CmdTools import Command
 from Parameters import ParamType
 from Statistic import Statistic
 from UI.pyqt_prototype.runner import coerce_value, execute_point_query
-
-
-APP_STYLE = """
-QMainWindow, QWidget#appRoot {
-    background: #f6f8fc;
-    color: #172033;
-}
-QFrame#card {
-    background: #ffffff;
-    border: 1px solid #d7dfeb;
-    border-radius: 14px;
-}
-QWidget#cardBody, QWidget#parameterList, QWidget#parameterRow, QWidget#fieldBlock {
-    background: transparent;
-}
-QLabel {
-    background: transparent;
-    color: #172033;
-}
-QLabel#eyebrow {
-    color: #53627a;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1.4px;
-}
-QLabel#title {
-    color: #0f172a;
-    font-size: 26px;
-    font-weight: 800;
-}
-QLabel#subtitle, QLabel#helpText, QLabel#statusText {
-    color: #53627a;
-    font-size: 13px;
-}
-QLabel#sectionTitle {
-    color: #0f172a;
-    font-size: 17px;
-    font-weight: 750;
-}
-QLabel#fieldLabel {
-    color: #111827;
-    font-size: 13px;
-    font-weight: 750;
-}
-QLabel#fieldHint {
-    color: #64748b;
-    font-size: 12px;
-    line-height: 145%;
-}
-QComboBox, QLineEdit, QSpinBox {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    color: #111827;
-    padding: 7px 10px;
-    min-height: 28px;
-    selection-background-color: #dbeafe;
-}
-QComboBox:focus, QLineEdit:focus, QSpinBox:focus {
-    border: 1px solid #2563eb;
-}
-QCheckBox {
-    background: transparent;
-    color: #334155;
-    spacing: 9px;
-}
-QCheckBox::indicator {
-    width: 16px;
-    height: 16px;
-}
-QPushButton {
-    background: #2563eb;
-    border: none;
-    border-radius: 10px;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: 750;
-    min-height: 42px;
-    padding: 0 18px;
-}
-QPushButton:hover {
-    background: #1d4ed8;
-}
-QPushButton:pressed {
-    background: #1e40af;
-}
-QPushButton:disabled {
-    background: #94a3b8;
-}
-QScrollArea {
-    background: transparent;
-    border: none;
-}
-QTextEdit {
-    background: #111827;
-    border: 1px solid #0f172a;
-    border-radius: 12px;
-    color: #e5e7eb;
-    font-family: SF Mono, Menlo, Consolas, monospace;
-    font-size: 13px;
-    padding: 14px;
-}
-"""
+from UI.pyqt_prototype.theme import LAYOUT, TYPOGRAPHY, qt_stylesheet
 
 
 class WorkerSignals(QObject):
@@ -276,8 +174,13 @@ class SequencerPrototypeWindow(QMainWindow):
         root = QWidget()
         root.setObjectName("appRoot")
         shell = QVBoxLayout(root)
-        shell.setContentsMargins(28, 24, 28, 28)
-        shell.setSpacing(18)
+        shell.setContentsMargins(
+            LAYOUT["shell_margin_x"],
+            LAYOUT["shell_margin_top"],
+            LAYOUT["shell_margin_x"],
+            LAYOUT["shell_margin_bottom"],
+        )
+        shell.setSpacing(LAYOUT["shell_gap"])
         shell.addLayout(self._make_header())
         shell.addLayout(self._make_body(), 1)
         self.setCentralWidget(root)
@@ -309,7 +212,7 @@ class SequencerPrototypeWindow(QMainWindow):
 
     def _make_query_card(self):
         card, layout = self._card("Query setup", "Choose an object, optional statistic, and generated parameters.")
-        card.setFixedWidth(430)
+        card.setFixedWidth(LAYOUT["query_card_width"])
 
         layout.addWidget(self._make_field_block("Object", self.command_picker))
         layout.addWidget(self._make_field_block("Statistic", self.statistic_picker))
@@ -349,7 +252,12 @@ class SequencerPrototypeWindow(QMainWindow):
         card = QFrame()
         card.setObjectName("card")
         layout = QVBoxLayout(card)
-        layout.setContentsMargins(22, 20, 22, 20)
+        layout.setContentsMargins(
+            LAYOUT["card_padding_x"],
+            LAYOUT["card_padding_y"],
+            LAYOUT["card_padding_x"],
+            LAYOUT["card_padding_y"],
+        )
         layout.setSpacing(13)
         title_label = QLabel(title)
         title_label.setObjectName("sectionTitle")
@@ -402,10 +310,10 @@ class SequencerPrototypeWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
-    app.setStyleSheet(APP_STYLE)
-    app.setFont(QFont("Arial", 10))
+    app.setStyleSheet(qt_stylesheet())
+    app.setFont(QFont(TYPOGRAPHY["qt_ui_font"], 10))
     window = SequencerPrototypeWindow()
-    window.resize(1180, 760)
+    window.resize(LAYOUT["window_width"], LAYOUT["window_height"])
     window.show()
     sys.exit(app.exec())
 

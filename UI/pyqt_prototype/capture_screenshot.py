@@ -12,7 +12,8 @@ from PySide6.QtCore import QTimer
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QApplication
 
-from UI.pyqt_prototype.main import APP_STYLE, SequencerPrototypeWindow
+from UI.pyqt_prototype.main import SequencerPrototypeWindow
+from UI.pyqt_prototype.theme import LAYOUT, TYPOGRAPHY, qt_stylesheet
 
 
 OUTPUT_PATH = Path(__file__).with_name("screenshot.png")
@@ -21,11 +22,11 @@ OUTPUT_PATH = Path(__file__).with_name("screenshot.png")
 def main():
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
-    app.setStyleSheet(APP_STYLE)
-    app.setFont(QFont("Arial", 10))
+    app.setStyleSheet(qt_stylesheet())
+    app.setFont(QFont(TYPOGRAPHY["qt_ui_font"], 10))
 
     window = SequencerPrototypeWindow()
-    window.resize(1180, 760)
+    window.resize(LAYOUT["window_width"], LAYOUT["window_height"])
     window.show()
 
     def capture():

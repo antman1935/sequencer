@@ -10,9 +10,21 @@ python3 -m venv .venv
 .venv/bin/python UI/pyqt_prototype/main.py
 ```
 
-## Visual preview
+## Browser-verified visual preview
 
-Open `UI/pyqt_prototype/prototype_mockup.svg` to see the current polished layout preview.
+The Qt app and browser preview share `theme.py` for colors, typography, and core layout constants. Use the browser preview for fast visual iteration before expanding the whole program:
+
+```bash
+cd UI/pyqt_prototype
+npm install
+npm run preview
+```
+
+That generates:
+
+- `preview.html` — browser-renderable layout preview
+- `preview.svg` — token-rendered fallback preview
+- `preview.png` — screenshot proof captured by Playwright, or by the SVG fallback when sandbox browser libraries are unavailable
 
 To capture the native Qt window locally:
 
