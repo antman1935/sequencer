@@ -5,8 +5,9 @@ This is a utility file for printing out one or more tables in a latex file.
 """
 
 class LatexTablePrinter:
-    def __init__(self, filename):
-        self.outfile = open(filename, "w+")
+    def __init__(self, filename=None, *, stream=None):
+        self._owns_stream = stream is None
+        self.outfile = open(filename, "w+", encoding="utf-8") if stream is None else stream
         self._writePreamble()
 
     def _writePreamble(self):
@@ -43,15 +44,16 @@ class LatexTablePrinter:
             )
         self.outfile.writelines(
             [
-                "\end{tabular}\n",
-                "\end{table}\n",
+                "\\end{tabular}\n",
+                "\\end{table}\n",
             ]
         )
 
     def close(self):
         self.outfile.writelines(
             [
-                "\end{document}\n"
+                "\\end{document}\n"
             ]
         )
-        self.outfile.close()
+        if self._owns_stream:
+            self.outfile.close()

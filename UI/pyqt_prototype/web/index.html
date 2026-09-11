@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Generate mathematical objects, apply restrictions, and explore sequences and tables.">
+  <title>Sequencer</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/theme.css">
+  <link rel="stylesheet" href="/app.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+<main class="app">
+  <header class="page-header">
+    <div class="eyebrow">SEQUENCER</div>
+    <h1>Build a mathematical query</h1>
+    <p>Explore objects, sequences, and the statistics that connect them.</p>
+  </header>
+  <div class="workspace">
+    <section class="card setup" aria-labelledby="setup-title">
+      <h2 id="setup-title">Query setup</h2>
+      <p class="help">Choose an object family and what you want to count.</p>
+      <form id="query-form">
+        <fieldset id="query-fields" disabled>
+          <div class="form-scroll">
+          <div class="two-fields">
+            <div class="field"><label for="api">API</label><select id="api"></select></div>
+            <div class="field"><label for="statistic">Statistic</label><select id="statistic"></select></div>
+          </div>
+          <div class="field"><label for="command">Object</label><select id="command"></select><p id="command-description" class="hint"></p></div>
+          <section class="section" aria-labelledby="parameters-title">
+            <h3 id="parameters-title">Parameters</h3>
+            <p class="hint">Required fields are marked *. Leave optional fields blank to use their defaults.</p>
+            <div id="parameters" class="parameters"></div>
+          </section>
+          <section id="range-fields" class="section" hidden aria-labelledby="dimensions-title">
+            <h3 id="dimensions-title">Range dimensions</h3>
+            <p class="hint">Group by parameters or calculated statistics. Parameter values above are the upper limits.</p>
+            <div id="dimensions" class="dimension-list"></div>
+            <div class="field output-field"><label for="output">Range output</label><select id="output"></select></div>
+          </section>
+          <section class="section" aria-labelledby="restrictions-title">
+            <h3 id="restrictions-title">Restrictions <span class="optional">optional</span></h3>
+            <p class="hint">All restrictions in a group must pass. Any group can match.</p>
+            <div id="restriction-groups"></div>
+            <button id="add-group" type="button" class="secondary">+ Add OR restriction group</button>
+          </section>
+          </div>
+          <label class="check elements"><input id="print-elements" type="checkbox">Show generated elements</label>
+          <button id="run" type="submit" class="primary">Run query</button>
+        </fieldset>
+        <p id="status" role="status" aria-live="polite">Loading query options…</p>
+        <p id="error" role="alert" hidden></p>
+      </form>
+    </section>
+    <section class="card results" aria-labelledby="results-title" aria-busy="false">
+      <div class="result-header"><h2 id="results-title">Result</h2><div id="downloads"></div></div>
+      <p id="summary" class="help">Your results will appear here.</p>
+      <div id="result-tabs" class="tabs" role="tablist" aria-label="Result views"></div>
+      <div id="result-panels" class="panels"></div>
+    </section>
+  </div>
+  <noscript>This form needs JavaScript enabled to run queries.</noscript>
+</main>
+</body>
+</html>

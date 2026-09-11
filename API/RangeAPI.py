@@ -32,7 +32,7 @@ def getTableBounds(table):
     max_column = max(table[max_row].keys())
     column_widths = {}
     column_widths["row_start"] = 0
-    for r in range(min_row, max_row + 1):
+    for r in table:
         min_column = min(min_column, min(table[r].keys()))
         max_column = max(max_column, max(table[r].keys()))
             
@@ -45,7 +45,7 @@ def printMultipleTables(result, dimensions: list[str], print_func):
             column_bounds, row_bounds = getTableBounds(curr)
             [row_dim, col_dim] = reversed(dimensions[i:])
             data = invert(curr)
-            data = [[0 if c not in data[r] else data[r][c] for c in range(column_bounds[0], column_bounds[1] + 1)] for r in range(row_bounds[0], row_bounds[1] + 1)]
+            data = [[data.get(r, {}).get(c, 0) for c in range(column_bounds[0], column_bounds[1] + 1)] for r in range(row_bounds[0], row_bounds[1] + 1)]
             print_func(label, row_bounds, row_dim, column_bounds, col_dim, data)
             return
         for j in range(min(curr.keys()), max(curr.keys()) + 1):

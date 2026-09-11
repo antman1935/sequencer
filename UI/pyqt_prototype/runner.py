@@ -1,7 +1,9 @@
 from contextlib import redirect_stdout
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from functools import wraps
 from io import StringIO
 from typing import Any
+from threading import RLock
 
 import Commands.CommandRegistration  # registers all commands
 from API.RangeAPI import getTableBounds, invert, printResults
@@ -27,6 +29,19 @@ class QueryResult:
     summary: str
     text: str
     tables: list[RangeTable]
+    downloads: list[dict[str, str]] = field(default_factory=list)
+
+
+_query_lock = RLock()
+
+
+def serialized_query(function):
+    """CLI output capture is process-wide; keep simultaneous clients isolated."""
+    @wraps(function)
+    def wrapped(*args, **kwargs):
+        with _query_lock:
+            return function(*args, **kwargs)
+    return wrapped
 
 
 def format_parameters(values: dict[str, object]) -> str:
@@ -83,6 +98,7 @@ def execute_point_query(command_name: str, parameters: dict[str, object], statis
     return run_point_query(command_name, parameters, statistic_name, print_elements).text
 
 
+@serialized_query
 def run_point_query(command_name: str, parameters: dict[str, object], statistic_name: str | None = None, print_elements: bool = False, restriction_groups: list[list[tuple[str, dict[str, object]]]] | None = None) -> QueryResult:
     command = instantiate_command(command_name, parameters, restriction_groups)
     api = SequencerAPI.apis["point"](format_parameters({"p": print_elements}))
@@ -96,6 +112,7 @@ def run_point_query(command_name: str, parameters: dict[str, object], statistic_
     return QueryResult(f"Point query on {command}", text, [])
 
 
+@serialized_query
 def run_range_query(
     command_name: str,
     parameters: dict[str, object],
@@ -105,11 +122,16 @@ def run_range_query(
     output_type: OutputType = OutputType.ASCII_TABLE,
     restriction_groups: list[list[tuple[str, dict[str, object]]]] | None = None,
 ) -> QueryResult:
+    if output_type == OutputType.LATEX_TABLE and len(dimensions) < 2:
+        raise ValueError("LaTeX output requires at least two dimensions.")
     command = instantiate_command(command_name, parameters, restriction_groups)
     stat = None if statistic_name is None else Statistic.statistics[statistic_name]()
     api = SequencerAPI.apis["range"](format_parameters({"dimensions": dimensions, "p": print_elements, "out": output_type}))
     api.setCommand(command)
     api.setStatistic(stat)
+    for dimension in dimensions:
+        if dimension.dim_type == DimensionType.PARAMETER and api.param_limits.get(dimension.name) is None:
+            raise ValueError(f"Set an upper limit for parameter '{dimension.name}' before using it as a range dimension.")
 
     captured = StringIO()
     with redirect_stdout(captured):
@@ -119,7 +141,8 @@ def run_range_query(
         api._iterate(count, ranged_params, 0, {k: v for k, v in api.param_limits.items() if k not in ranged_param_names})
 
     dimension_names = [dim.name for dim in reversed(api.dimensions)]
-    tables = range_tables(count, dimension_names) if len(dimension_names) >= 2 and output_type == OutputType.ASCII_TABLE else []
+    tables = range_tables(count, dimension_names) if count and len(dimension_names) >= 2 and output_type in (OutputType.ASCII_TABLE, OutputType.LATEX_TABLE) else []
+    downloads = []
 
     formatted = StringIO()
     with redirect_stdout(formatted):
@@ -127,9 +150,21 @@ def run_range_query(
         if print_elements and captured.getvalue():
             print("Elements:")
             print(captured.getvalue(), end="")
-        printResults(output_type, count, dimension_names)
+        if not count:
+            print("Empty set. No objects match this query.")
+        elif output_type == OutputType.LATEX_TABLE:
+            from API.util.Latex import LatexTablePrinter
+            latex = StringIO()
+            printer = LatexTablePrinter(stream=latex)
+            for table in tables:
+                printer.writeTable(table.label, table.row_bounds, table.row_dimension, table.column_bounds, table.column_dimension, table.data)
+            printer.close()
+            downloads.append({"name": "out.tex", "content_type": "application/x-tex", "content": latex.getvalue()})
+            print(latex.getvalue())
+        else:
+            printResults(output_type, count, dimension_names)
 
-    return QueryResult(f"Range query on {command}", formatted.getvalue(), tables)
+    return QueryResult(f"Range query on {command}", formatted.getvalue(), tables, downloads)
 
 
 def range_tables(result, dimensions: list[str]) -> list[RangeTable]:

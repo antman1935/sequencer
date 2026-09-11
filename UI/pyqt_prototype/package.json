@@ -2,10 +2,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "generate-preview": "python3 generate_preview.py",
+    "start": "python web_server.py",
     "capture-preview": "node capture_preview.mjs",
-    "capture-preview:fallback": "node capture_preview_fallback.mjs",
-    "preview": "python3 generate_preview.py && (node capture_preview.mjs || node capture_preview_fallback.mjs)"
+    "preview": "python web_server.py",
+    "test:ui": "node tests/browser.mjs"
   },
   "devDependencies": {
     "playwright": "^1.55.0",

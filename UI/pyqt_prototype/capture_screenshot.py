@@ -1,42 +1,42 @@
+"""Capture the actual desktop web view after its metadata has loaded."""
 import os
 import sys
 from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-
+if os.environ["QT_QPA_PLATFORM"] == "offscreen":
+    os.environ.setdefault("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-gpu")
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from PySide6.QtCore import QTimer
-from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QApplication
-
 from UI.pyqt_prototype.main import SequencerPrototypeWindow
-from UI.pyqt_prototype.theme import LAYOUT, TYPOGRAPHY, qt_stylesheet
-
-
-OUTPUT_PATH = Path(__file__).with_name("screenshot.png")
 
 
 def main():
     app = QApplication(sys.argv)
-    app.setStyle("Fusion")
-    app.setStyleSheet(qt_stylesheet())
-    app.setFont(QFont(TYPOGRAPHY["qt_ui_font"], 10))
-
     window = SequencerPrototypeWindow()
-    window.resize(LAYOUT["window_width"], LAYOUT["window_height"])
     window.show()
+    captured = False
 
-    def capture():
-        pixmap = window.grab()
-        pixmap.save(str(OUTPUT_PATH))
-        app.quit()
+    def ready(loaded):
+        nonlocal captured
+        if loaded and not captured:
+            captured = True
+            window.grab().save(str(Path(__file__).with_name("screenshot.png")))
+            window.close()
+            app.quit()
 
-    QTimer.singleShot(300, capture)
+    timer = QTimer()
+    timer.timeout.connect(lambda: window.view.page().runJavaScript("document.querySelector('#status')?.textContent === 'Ready'", ready))
+    timer.start(100)
+    QTimer.singleShot(15000, app.quit)
     app.exec()
+    window.close()
+    return 0 if captured else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
