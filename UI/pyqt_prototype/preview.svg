@@ -2,32 +2,39 @@
   <rect width="100%" height="100%" fill="#f6f8fc"/>
   <text x="28" y="38" fill="#53627a" font-family="Arial" font-size="12" font-weight="700" letter-spacing="1.4">SEQUENCER PROTOTYPE</text>
   <text x="28" y="73" fill="#0f172a" font-family="Arial" font-size="26" font-weight="800">Build mathematical queries directly from Python metadata</text>
-  <text x="28" y="102" fill="#53627a" font-family="Arial" font-size="13">A cleaner Qt Widgets direction before expanding coverage beyond point queries.</text>
+  <text x="28" y="102" fill="#53627a" font-family="Arial" font-size="13">Python-first Qt coverage for point and range queries, with real rendered range tables.</text>
   <rect x="28" y="126" width="430" height="606" rx="14" fill="#ffffff" stroke="#d7dfeb"/>
   <rect x="476" y="126" width="676" height="606" rx="14" fill="#ffffff" stroke="#d7dfeb"/>
   <text x="50" y="165" fill="#0f172a" font-family="Arial" font-size="17" font-weight="750">Query setup</text>
-  <text x="50" y="194" fill="#53627a" font-family="Arial" font-size="13">Choose an object, optional statistic, and generated parameters.</text>
-  <text x="50" y="233" fill="#111827" font-family="Arial" font-size="13" font-weight="750">Object</text>
-  <rect x="50" y="246" width="386" height="44" rx="8" fill="#fff" stroke="#cbd5e1"/>
-  <text x="62" y="274" fill="#111827" font-family="Arial" font-size="14">Fubini Rankings</text>
-  <text x="50" y="323" fill="#111827" font-family="Arial" font-size="13" font-weight="750">Statistic</text>
-  <rect x="50" y="336" width="386" height="44" rx="8" fill="#fff" stroke="#cbd5e1"/>
-  <text x="62" y="364" fill="#111827" font-family="Arial" font-size="14">Count objects</text>
-  <text x="50" y="417" fill="#111827" font-family="Arial" font-size="13" font-weight="750">n *</text>
-  <text x="50" y="440" fill="#64748b" font-family="Arial" font-size="12">length of the ranking</text>
-  <rect x="50" y="453" width="386" height="44" rx="8" fill="#fff" stroke="#cbd5e1"/>
-  <text x="62" y="481" fill="#111827" font-family="Arial" font-size="14">1</text>
-  <text x="50" y="536" fill="#111827" font-family="Arial" font-size="13" font-weight="750">k</text>
-  <text x="50" y="559" fill="#64748b" font-family="Arial" font-size="12">number of blocks</text>
-  <rect x="50" y="572" width="386" height="44" rx="8" fill="#fff" stroke="#cbd5e1"/>
-  <text x="62" y="600" fill="#111827" font-family="Arial" font-size="14">unset</text>
-  <rect x="50" y="648" width="16" height="16" rx="3" fill="#fff" stroke="#94a3b8"/>
-  <text x="75" y="661" fill="#334155" font-family="Arial" font-size="14">Show generated elements</text>
-  <rect x="50" y="680" width="386" height="42" rx="10" fill="#2563eb"/>
-  <text x="190" y="706" fill="#fff" font-family="Arial" font-size="14" font-weight="750">Run point query</text>
+  <text x="50" y="194" fill="#53627a" font-family="Arial" font-size="13">Choose API, object family, optional statistic, and typed parameters.</text>
+  <text x="50" y="232" fill="#111827" font-family="Arial" font-size="13" font-weight="750">API</text>
+  <rect x="50" y="242" width="386" height="38" rx="8" fill="#fff" stroke="#cbd5e1"/><text x="62" y="267" fill="#111827" font-family="Arial" font-size="14">Range</text>
+  <text x="50" y="305" fill="#111827" font-family="Arial" font-size="13" font-weight="750">Object</text>
+  <rect x="50" y="315" width="386" height="38" rx="8" fill="#fff" stroke="#cbd5e1"/><text x="62" y="340" fill="#111827" font-family="Arial" font-size="14">Fubini Rankings</text>
+  <text x="50" y="378" fill="#111827" font-family="Arial" font-size="13" font-weight="750">Statistic</text>
+  <rect x="50" y="388" width="386" height="38" rx="8" fill="#fff" stroke="#cbd5e1"/><text x="62" y="413" fill="#111827" font-family="Arial" font-size="14">Count objects</text>
+  <text x="50" y="451" fill="#111827" font-family="Arial" font-size="13" font-weight="750">Range output</text>
+  <rect x="50" y="461" width="386" height="38" rx="8" fill="#fff" stroke="#cbd5e1"/><text x="62" y="486" fill="#111827" font-family="Arial" font-size="14">Rendered table</text>
+  <text x="50" y="524" fill="#111827" font-family="Arial" font-size="13" font-weight="750">n *</text>
+  <rect x="50" y="535" width="386" height="38" rx="8" fill="#fff" stroke="#cbd5e1"/><text x="62" y="560" fill="#111827" font-family="Arial" font-size="14">3</text>
+  <text x="50" y="600" fill="#111827" font-family="Arial" font-size="13" font-weight="750">Range dimensions</text>
+  <rect x="50" y="612" width="386" height="58" rx="10" fill="#fff" stroke="#d7dfeb"/>
+  <rect x="64" y="626" width="16" height="16" rx="3" fill="#2563eb"/><text x="90" y="640" fill="#334155" font-family="Arial" font-size="14">Parameter: n</text>
+  <rect x="224" y="626" width="16" height="16" rx="3" fill="#2563eb"/><text x="250" y="640" fill="#334155" font-family="Arial" font-size="14">Computed: Runs</text>
+  <rect x="50" y="680" width="386" height="42" rx="10" fill="#2563eb"/><text x="207" y="706" fill="#fff" font-family="Arial" font-size="14" font-weight="750">Run query</text>
   <text x="498" y="165" fill="#0f172a" font-family="Arial" font-size="17" font-weight="750">Result</text>
-  <text x="498" y="194" fill="#53627a" font-family="Arial" font-size="13">Captured command output appears here without freezing the interface.</text>
-  <rect x="498" y="216" width="632" height="490" rx="12" fill="#111827" stroke="#0f172a"/>
-  <text x="516" y="250" fill="#93a4c7" font-family="Menlo, Consolas, monospace" font-size="13">Run a query to see results here.</text>
-  <text x="516" y="308" fill="#e5e7eb" font-family="Menlo, Consolas, monospace" font-size="13">Example: Point Query on Fubini Rankings.</text>
+  <text x="498" y="194" fill="#53627a" font-family="Arial" font-size="13">Range table output is rendered as selectable Qt tables; text output remains available.</text>
+  <rect x="498" y="226" width="60" height="34" rx="8" fill="#e8eef7" stroke="#d7dfeb"/><text x="514" y="248" fill="#53627a" font-family="Arial" font-size="13">Text</text>
+  <rect x="558" y="226" width="64" height="34" rx="8" fill="#fff" stroke="#d7dfeb"/><text x="574" y="248" fill="#0f172a" font-family="Arial" font-size="13" font-weight="700">Table</text>
+  <rect x="498" y="260" width="632" height="446" rx="12" fill="#fff" stroke="#d7dfeb"/>
+  <text x="520" y="298" fill="#0f172a" font-family="Arial" font-size="15" font-weight="750">Rendered range table</text>
+  <g font-family="Arial" font-size="14" text-anchor="middle">
+    <rect x="520" y="320" width="420" height="160" fill="#fff" stroke="#d7dfeb"/>
+    <path d="M520 360H940M520 400H940M520 440H940M625 320V480M730 320V480M835 320V480" stroke="#d7dfeb"/>
+    <rect x="520" y="320" width="420" height="40" fill="#eef4ff"/>
+    <text x="677" y="345" fill="#0f172a">runs=1</text><text x="782" y="345" fill="#0f172a">runs=2</text><text x="887" y="345" fill="#0f172a">runs=3</text>
+    <text x="572" y="385" fill="#0f172a">n=1</text><text x="677" y="385" fill="#172033">1</text>
+    <text x="572" y="425" fill="#0f172a">n=2</text><text x="677" y="425" fill="#172033">1</text><text x="782" y="425" fill="#172033">2</text>
+    <text x="572" y="465" fill="#0f172a">n=3</text><text x="677" y="465" fill="#172033">1</text><text x="782" y="465" fill="#172033">8</text><text x="887" y="465" fill="#172033">4</text>
+  </g>
 </svg>

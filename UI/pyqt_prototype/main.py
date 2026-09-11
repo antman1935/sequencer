@@ -21,40 +21,55 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSpinBox,
+    QTabWidget,
+    QTableWidget,
+    QTableWidgetItem,
     QTextEdit,
     QVBoxLayout,
     QWidget,
 )
 
 from CmdTools import Command
-from Parameters import ParamType
-from Statistic import Statistic
-from UI.pyqt_prototype.runner import coerce_value, execute_point_query
+from Parameters import OutputType, ParamType
+from SequencerAPI import SequencerAPI
+from Statistic import Dimension, DimensionType, Statistic
+from UI.pyqt_prototype.runner import QueryResult, coerce_value, run_query
 from UI.pyqt_prototype.theme import LAYOUT, TYPOGRAPHY, qt_stylesheet
 
 
 class WorkerSignals(QObject):
-    finished = Signal(str)
+    finished = Signal(object)
     failed = Signal(str)
 
 
 class QueryWorker(QRunnable):
-    def __init__(self, command_name, parameters, statistic_name, print_elements):
+    def __init__(self, api_name, command_name, parameters, statistic_name, print_elements, dimensions, output_type):
         super().__init__()
+        self.api_name = api_name
         self.command_name = command_name
         self.parameters = parameters
         self.statistic_name = statistic_name
         self.print_elements = print_elements
+        self.dimensions = dimensions
+        self.output_type = output_type
         self.signals = WorkerSignals()
 
     @Slot()
     def run(self):
         try:
-            output = execute_point_query(self.command_name, self.parameters, self.statistic_name, self.print_elements)
+            result = run_query(
+                self.api_name,
+                self.command_name,
+                self.parameters,
+                self.statistic_name,
+                self.print_elements,
+                self.dimensions,
+                self.output_type,
+            )
         except Exception as exc:
             self.signals.failed.emit(str(exc))
             return
-        self.signals.finished.emit(output)
+        self.signals.finished.emit(result)
 
 
 class GeneratedParameterForm(QWidget):
@@ -99,14 +114,12 @@ class GeneratedParameterForm(QWidget):
         row_layout = QVBoxLayout(row)
         row_layout.setContentsMargins(0, 0, 0, 0)
         row_layout.setSpacing(6)
-
         label = QLabel(parameter.name + ("  *" if parameter.required else ""))
         label.setObjectName("fieldLabel")
         hint = QLabel(parameter.description or "Optional value")
         hint.setObjectName("fieldHint")
         hint.setWordWrap(True)
         hint.setMinimumHeight(30)
-
         row_layout.addWidget(label)
         row_layout.addWidget(hint)
         row_layout.addWidget(editor)
@@ -147,11 +160,49 @@ class GeneratedParameterForm(QWidget):
         return coerce_value(parameter.param_type, text)
 
 
+class DimensionSelector(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setObjectName("parameterList")
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(8)
+        self.checkboxes = []
+
+    def set_command(self, command_name):
+        self.checkboxes = []
+        while self.layout.count():
+            item = self.layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        command_class = Command.commands[command_name]
+        for parameter in command_class.parameters:
+            if parameter.param_type in (ParamType.NATURAL, ParamType.INT_POS):
+                self._add_dimension(parameter.name, DimensionType.PARAMETER, f"Parameter: {parameter.name}")
+        for key, statistic_class in Statistic.statistics.items():
+            self._add_dimension(key, DimensionType.COMPUTED, f"Computed: {statistic_class.ui_name}")
+        self.layout.addStretch(1)
+
+    def values(self):
+        return [Dimension(dim_type, name) for box, name, dim_type in self.checkboxes if box.isChecked()]
+
+    def _add_dimension(self, name, dim_type, label):
+        checkbox = QCheckBox(label)
+        checkbox.setToolTip("Use this dimension to group range results")
+        self.checkboxes.append((checkbox, name, dim_type))
+        self.layout.addWidget(checkbox)
+
+
 class SequencerPrototypeWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Sequencer Python-first Qt Prototype")
         self.thread_pool = QThreadPool.globalInstance()
+
+        self.api_picker = QComboBox()
+        for key, api_class in SequencerAPI.apis.items():
+            self.api_picker.addItem(api_class.ui_name, key)
 
         self.command_picker = QComboBox()
         for key, command_class in Command.commands.items():
@@ -162,29 +213,34 @@ class SequencerPrototypeWindow(QMainWindow):
         for key, statistic_class in Statistic.statistics.items():
             self.statistic_picker.addItem(statistic_class.ui_name, key)
 
+        self.output_picker = QComboBox()
+        self.output_picker.addItem("Rendered table", OutputType.ASCII_TABLE)
+        self.output_picker.addItem("OEIS sequence", OutputType.OEIS_LOOKUP)
+        self.output_picker.addItem("Raw data", OutputType.RAW)
+        self.output_picker.addItem("LaTeX file", OutputType.LATEX_TABLE)
+
         self.print_elements = QCheckBox("Show generated elements")
         self.form = GeneratedParameterForm()
-        self.output = QTextEdit()
-        self.output.setReadOnly(True)
-        self.output.setPlaceholderText("Run a query to see results here.")
-        self.run_button = QPushButton("Run point query")
+        self.dimensions = DimensionSelector()
+        self.output_tabs = QTabWidget()
+        self.text_output = QTextEdit()
+        self.text_output.setReadOnly(True)
+        self.text_output.setPlaceholderText("Run a query to see results here.")
+        self.output_tabs.addTab(self.text_output, "Text")
+        self.run_button = QPushButton("Run query")
         self.status = QLabel("Ready")
         self.status.setObjectName("statusText")
 
         root = QWidget()
         root.setObjectName("appRoot")
         shell = QVBoxLayout(root)
-        shell.setContentsMargins(
-            LAYOUT["shell_margin_x"],
-            LAYOUT["shell_margin_top"],
-            LAYOUT["shell_margin_x"],
-            LAYOUT["shell_margin_bottom"],
-        )
+        shell.setContentsMargins(LAYOUT["shell_margin_x"], LAYOUT["shell_margin_top"], LAYOUT["shell_margin_x"], LAYOUT["shell_margin_bottom"])
         shell.setSpacing(LAYOUT["shell_gap"])
         shell.addLayout(self._make_header())
         shell.addLayout(self._make_body(), 1)
         self.setCentralWidget(root)
 
+        self.api_picker.currentIndexChanged.connect(self.refresh_visibility)
         self.command_picker.currentIndexChanged.connect(self.refresh_form)
         self.run_button.clicked.connect(self.run_query)
         self.refresh_form()
@@ -196,7 +252,7 @@ class SequencerPrototypeWindow(QMainWindow):
         eyebrow.setObjectName("eyebrow")
         title = QLabel("Build mathematical queries directly from Python metadata")
         title.setObjectName("title")
-        subtitle = QLabel("A cleaner Qt Widgets direction before expanding coverage beyond point queries.")
+        subtitle = QLabel("Python-first Qt coverage for point and range queries, with real rendered range tables.")
         subtitle.setObjectName("subtitle")
         layout.addWidget(eyebrow)
         layout.addWidget(title)
@@ -211,30 +267,41 @@ class SequencerPrototypeWindow(QMainWindow):
         return layout
 
     def _make_query_card(self):
-        card, layout = self._card("Query setup", "Choose an object, optional statistic, and generated parameters.")
+        card, layout = self._card("Query setup", "Choose API, object family, optional statistic, and typed parameters.")
         card.setFixedWidth(LAYOUT["query_card_width"])
-
+        layout.addWidget(self._make_field_block("API", self.api_picker))
         layout.addWidget(self._make_field_block("Object", self.command_picker))
         layout.addWidget(self._make_field_block("Statistic", self.statistic_picker))
-        layout.addSpacing(4)
+        self.output_block = self._make_field_block("Range output", self.output_picker)
+        layout.addWidget(self.output_block)
 
-        scroller = QScrollArea()
-        scroller.setWidgetResizable(True)
-        scroller.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroller.setWidget(self.form)
-        scroller.setMinimumHeight(260)
-        layout.addWidget(scroller, 1)
+        command_scroller = QScrollArea()
+        command_scroller.setWidgetResizable(True)
+        command_scroller.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        command_scroller.setWidget(self.form)
+        command_scroller.setMinimumHeight(190)
+        layout.addWidget(command_scroller, 1)
 
+        self.dimension_block = self._make_field_block("Range dimensions", self._scroll_widget(self.dimensions, 150))
+        layout.addWidget(self.dimension_block)
         layout.addWidget(self.print_elements)
         layout.addWidget(self.run_button)
         layout.addWidget(self.status)
         return card
 
     def _make_result_card(self):
-        card, layout = self._card("Result", "Captured command output appears here without freezing the interface.")
-        self.output.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        layout.addWidget(self.output, 1)
+        card, layout = self._card("Result", "Range table output is rendered as selectable Qt tables; text output remains available.")
+        self.output_tabs.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        layout.addWidget(self.output_tabs, 1)
         return card
+
+    def _scroll_widget(self, widget, minimum_height):
+        scroller = QScrollArea()
+        scroller.setWidgetResizable(True)
+        scroller.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroller.setWidget(widget)
+        scroller.setMinimumHeight(minimum_height)
+        return scroller
 
     def _make_field_block(self, label_text, editor):
         block = QWidget()
@@ -252,12 +319,7 @@ class SequencerPrototypeWindow(QMainWindow):
         card = QFrame()
         card.setObjectName("card")
         layout = QVBoxLayout(card)
-        layout.setContentsMargins(
-            LAYOUT["card_padding_x"],
-            LAYOUT["card_padding_y"],
-            LAYOUT["card_padding_x"],
-            LAYOUT["card_padding_y"],
-        )
+        layout.setContentsMargins(LAYOUT["card_padding_x"], LAYOUT["card_padding_y"], LAYOUT["card_padding_x"], LAYOUT["card_padding_y"])
         layout.setSpacing(13)
         title_label = QLabel(title)
         title_label.setObjectName("sectionTitle")
@@ -270,41 +332,81 @@ class SequencerPrototypeWindow(QMainWindow):
 
     @Slot()
     def refresh_form(self):
-        self.form.set_command(self.command_picker.currentData())
+        command_name = self.command_picker.currentData()
+        self.form.set_command(command_name)
+        self.dimensions.set_command(command_name)
+        self.status.setText("Ready")
+        self.refresh_visibility()
+
+    @Slot()
+    def refresh_visibility(self):
+        is_range = self.api_picker.currentData() == "range"
+        self.dimension_block.setVisible(is_range)
+        self.output_block.setVisible(is_range)
         self.status.setText("Ready")
 
     @Slot()
     def run_query(self):
         try:
             parameters = self.form.values()
+            dimensions = self.dimensions.values() if self.api_picker.currentData() == "range" else None
         except Exception as exc:
             QMessageBox.warning(self, "Invalid parameters", str(exc))
             return
 
         self.run_button.setEnabled(False)
         self.status.setText("Running query…")
-        self.output.setPlainText("Running…")
+        self.text_output.setPlainText("Running…")
+        self._clear_table_tabs()
         worker = QueryWorker(
+            self.api_picker.currentData(),
             self.command_picker.currentData(),
             parameters,
             self.statistic_picker.currentData(),
             self.print_elements.isChecked(),
+            dimensions,
+            self.output_picker.currentData(),
         )
         worker.signals.finished.connect(self.query_finished)
         worker.signals.failed.connect(self.query_failed)
         self.thread_pool.start(worker)
 
-    @Slot(str)
-    def query_finished(self, output):
+    @Slot(object)
+    def query_finished(self, result: QueryResult):
         self.run_button.setEnabled(True)
         self.status.setText("Complete")
-        self.output.setPlainText(output.strip())
+        self.text_output.setPlainText(result.text.strip())
+        self._clear_table_tabs()
+        for table in result.tables:
+            self.output_tabs.addTab(self._table_widget(table), table.label or "Table")
+        if result.tables:
+            self.output_tabs.setCurrentIndex(1)
 
     @Slot(str)
     def query_failed(self, message):
         self.run_button.setEnabled(True)
         self.status.setText("Failed")
-        self.output.setPlainText(message)
+        self._clear_table_tabs()
+        self.text_output.setPlainText(message)
+
+    def _clear_table_tabs(self):
+        while self.output_tabs.count() > 1:
+            self.output_tabs.removeTab(1)
+
+    def _table_widget(self, table):
+        row_start, row_end = table.row_bounds
+        col_start, col_end = table.column_bounds
+        widget = QTableWidget(row_end - row_start + 1, col_end - col_start + 1)
+        widget.setObjectName("resultTable")
+        widget.setHorizontalHeaderLabels([f"{table.column_dimension}={col}" for col in range(col_start, col_end + 1)])
+        widget.setVerticalHeaderLabels([f"{table.row_dimension}={row}" for row in range(row_start, row_end + 1)])
+        for row_index, row in enumerate(table.data):
+            for col_index, value in enumerate(row):
+                item = QTableWidgetItem("" if value == 0 else str(value))
+                item.setTextAlignment(Qt.AlignCenter)
+                widget.setItem(row_index, col_index, item)
+        widget.resizeColumnsToContents()
+        return widget
 
 
 def main():

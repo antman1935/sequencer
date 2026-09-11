@@ -130,6 +130,24 @@ QScrollArea {{
     background: transparent;
     border: none;
 }}
+QTabWidget::pane {{
+    border: 1px solid {c['card_border']};
+    border-radius: 12px;
+    background: {c['card_bg']};
+}}
+QTabBar::tab {{
+    background: #e8eef7;
+    border: 1px solid {c['card_border']};
+    border-bottom: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    color: {c['muted']};
+    padding: 8px 14px;
+}}
+QTabBar::tab:selected {{
+    background: {c['card_bg']};
+    color: {c['title']};
+}}
 QTextEdit {{
     background: {c['output_bg']};
     border: 1px solid {c['output_border']};
@@ -138,5 +156,19 @@ QTextEdit {{
     font-family: SF Mono, Menlo, Consolas, monospace;
     font-size: 13px;
     padding: 14px;
+}}
+QTableWidget#resultTable {{
+    background: {c['card_bg']};
+    border: none;
+    color: {c['text']};
+    gridline-color: {c['card_border']};
+    selection-background-color: #dbeafe;
+}}
+QHeaderView::section {{
+    background: #eef4ff;
+    border: 1px solid {c['card_border']};
+    color: {c['title']};
+    font-weight: 700;
+    padding: 6px;
 }}
 """
