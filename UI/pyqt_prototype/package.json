@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python web_server.py",
+    "capture-preview": "node capture_preview.mjs",
+    "preview": "python web_server.py",
+    "test:ui": "node tests/browser.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0",
+    "sharp": "^0.35.4"
+  }
+}
