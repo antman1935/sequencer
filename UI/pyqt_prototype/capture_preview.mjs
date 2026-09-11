@@ -1,8 +1,10 @@
 import { chromium } from 'playwright';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const previewPath = resolve('UI/pyqt_prototype/preview.html');
-const screenshotPath = resolve('UI/pyqt_prototype/preview.png');
+const previewDir = dirname(fileURLToPath(import.meta.url));
+const previewPath = resolve(previewDir, 'preview.html');
+const screenshotPath = resolve(previewDir, 'preview.png');
 
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1180, height: 760 }, deviceScaleFactor: 1 });
