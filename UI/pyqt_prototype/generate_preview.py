@@ -64,6 +64,7 @@ def preview_data():
         {"n": 3},
         dimensions=[Dimension(DimensionType.PARAMETER, "n"), Dimension(DimensionType.COMPUTED, "runs")],
         output_type=OutputType.ASCII_TABLE,
+        restriction_groups=[[('zigzag', {'is': True})]],
     )
     return command_name, result
 
@@ -101,6 +102,8 @@ select, .input {{ width: 100%; height: 38px; border: 1px solid {c['input_border'
 .parameter-list {{ display: flex; flex-direction: column; gap: 10px; margin: 0 0 12px; max-height: 172px; overflow: hidden; }}
 .field-hint {{ color: {c['hint']}; font-size: 12px; line-height: 1.35; margin-bottom: 7px; min-height: 16px; }}
 .dimension-list {{ border: 1px solid {c['card_border']}; border-radius: 10px; padding: 10px 12px; display: grid; gap: 8px; margin-bottom: 12px; }}
+.restriction-list {{ border: 1px solid {c['card_border']}; border-radius: 10px; padding: 10px 12px; display: grid; gap: 8px; margin-bottom: 12px; background: #f8fbff; }}
+.restriction-pill {{ border-radius: 999px; background: #e0ecff; color: {c['primary']}; padding: 4px 9px; font-size: 12px; font-weight: 750; width: max-content; }}
 .check {{ display: flex; align-items: center; gap: 9px; color: #334155; font-size: 14px; }}
 .box {{ width: 16px; height: 16px; border: 1px solid #94a3b8; border-radius: 3px; background: #fff; }}
 .box.on {{ background: {c['primary']}; box-shadow: inset 0 0 0 3px #fff; }}
@@ -139,6 +142,11 @@ td {{ color: {c['text']}; }}
           <label class="check"><span class="box on"></span><span>Computed: Runs</span></label>
           <label class="check"><span class="box"></span><span>Computed: Weak Runs</span></label>
         </div>
+        <div class="field-label">Restrictions</div>
+        <div class="restriction-list">
+          <div class="restriction-pill">Group 1 · all selected must pass</div>
+          <label class="check"><span class="box on"></span><span>ZigZag · is = true</span></label>
+        </div>
         <label class="check"><span class="box"></span><span>Show generated elements</span></label>
         <div class="spacer"></div>
         <button>Run query</button>
@@ -146,7 +154,7 @@ td {{ color: {c['text']}; }}
       </section>
       <section class="card">
         <h2>Result</h2>
-        <div class="help">Range table output is rendered as selectable Qt tables; text output remains available.</div>
+        <div class="help">Range table output is rendered as selectable Qt tables; text output remains available. This preview applies the ZigZag restriction.</div>
         <div class="tabs"><div class="tab">Text</div><div class="tab active">Table</div></div>
         <div class="panel">{table}<div class="output-note">{html.escape(result.text.splitlines()[0])}<br>Structured table data is rendered directly, not parsed from ASCII.</div></div>
       </section>
@@ -163,7 +171,7 @@ def build_svg():
   <rect width="100%" height="100%" fill="{c['app_bg']}"/>
   <text x="28" y="38" fill="{c['muted']}" font-family="Arial" font-size="12" font-weight="700" letter-spacing="1.4">SEQUENCER PROTOTYPE</text>
   <text x="28" y="73" fill="{c['title']}" font-family="Arial" font-size="26" font-weight="800">Build mathematical queries directly from Python metadata</text>
-  <text x="28" y="102" fill="{c['muted']}" font-family="Arial" font-size="13">Python-first Qt coverage for point and range queries, with real rendered range tables.</text>
+  <text x="28" y="102" fill="{c['muted']}" font-family="Arial" font-size="13">Python-first Qt coverage for APIs, restrictions, and real rendered range tables.</text>
   <rect x="28" y="126" width="430" height="606" rx="14" fill="{c['card_bg']}" stroke="{c['card_border']}"/>
   <rect x="476" y="126" width="676" height="606" rx="14" fill="{c['card_bg']}" stroke="{c['card_border']}"/>
   <text x="50" y="165" fill="{c['title']}" font-family="Arial" font-size="17" font-weight="750">Query setup</text>
@@ -178,13 +186,15 @@ def build_svg():
   <rect x="50" y="461" width="386" height="38" rx="8" fill="#fff" stroke="{c['input_border']}"/><text x="62" y="486" fill="#111827" font-family="Arial" font-size="14">Rendered table</text>
   <text x="50" y="524" fill="#111827" font-family="Arial" font-size="13" font-weight="750">n *</text>
   <rect x="50" y="535" width="386" height="38" rx="8" fill="#fff" stroke="{c['input_border']}"/><text x="62" y="560" fill="#111827" font-family="Arial" font-size="14">3</text>
-  <text x="50" y="600" fill="#111827" font-family="Arial" font-size="13" font-weight="750">Range dimensions</text>
-  <rect x="50" y="612" width="386" height="58" rx="10" fill="#fff" stroke="{c['card_border']}"/>
-  <rect x="64" y="626" width="16" height="16" rx="3" fill="{c['primary']}"/><text x="90" y="640" fill="#334155" font-family="Arial" font-size="14">Parameter: n</text>
-  <rect x="224" y="626" width="16" height="16" rx="3" fill="{c['primary']}"/><text x="250" y="640" fill="#334155" font-family="Arial" font-size="14">Computed: Runs</text>
-  <rect x="50" y="680" width="386" height="42" rx="10" fill="{c['primary']}"/><text x="207" y="706" fill="#fff" font-family="Arial" font-size="14" font-weight="750">Run query</text>
+  <text x="50" y="586" fill="#111827" font-family="Arial" font-size="13" font-weight="750">Range dimensions</text>
+  <rect x="50" y="598" width="386" height="48" rx="10" fill="#fff" stroke="{c['card_border']}"/>
+  <rect x="64" y="614" width="16" height="16" rx="3" fill="{c['primary']}"/><text x="90" y="628" fill="#334155" font-family="Arial" font-size="14">Parameter: n</text>
+  <rect x="224" y="614" width="16" height="16" rx="3" fill="{c['primary']}"/><text x="250" y="628" fill="#334155" font-family="Arial" font-size="14">Computed: Runs</text>
+  <text x="50" y="668" fill="#111827" font-family="Arial" font-size="13" font-weight="750">Restrictions</text>
+  <rect x="50" y="678" width="386" height="36" rx="10" fill="#f8fbff" stroke="{c['card_border']}"/>
+  <rect x="64" y="688" width="16" height="16" rx="3" fill="{c['primary']}"/><text x="90" y="702" fill="#334155" font-family="Arial" font-size="14">ZigZag · is = true</text>
   <text x="498" y="165" fill="{c['title']}" font-family="Arial" font-size="17" font-weight="750">Result</text>
-  <text x="498" y="194" fill="{c['muted']}" font-family="Arial" font-size="13">Range table output is rendered as selectable Qt tables; text output remains available.</text>
+  <text x="498" y="194" fill="{c['muted']}" font-family="Arial" font-size="13">Rendered table with ZigZag restriction applied.</text>
   <rect x="498" y="226" width="60" height="34" rx="8" fill="#e8eef7" stroke="{c['card_border']}"/><text x="514" y="248" fill="{c['muted']}" font-family="Arial" font-size="13">Text</text>
   <rect x="558" y="226" width="64" height="34" rx="8" fill="#fff" stroke="{c['card_border']}"/><text x="574" y="248" fill="{c['title']}" font-family="Arial" font-size="13" font-weight="700">Table</text>
   <rect x="498" y="260" width="632" height="446" rx="12" fill="#fff" stroke="{c['card_border']}"/>
@@ -195,8 +205,8 @@ def build_svg():
     <rect x="520" y="320" width="420" height="40" fill="#eef4ff"/>
     <text x="677" y="345" fill="{c['title']}">runs=1</text><text x="782" y="345" fill="{c['title']}">runs=2</text><text x="887" y="345" fill="{c['title']}">runs=3</text>
     <text x="572" y="385" fill="{c['title']}">n=1</text><text x="677" y="385" fill="{c['text']}">1</text>
-    <text x="572" y="425" fill="{c['title']}">n=2</text><text x="677" y="425" fill="{c['text']}">1</text><text x="782" y="425" fill="{c['text']}">2</text>
-    <text x="572" y="465" fill="{c['title']}">n=3</text><text x="677" y="465" fill="{c['text']}">1</text><text x="782" y="465" fill="{c['text']}">8</text><text x="887" y="465" fill="{c['text']}">4</text>
+    <text x="572" y="425" fill="{c['title']}">n=2</text><text x="677" y="425" fill="{c['text']}">1</text><text x="782" y="425" fill="{c['text']}">1</text>
+    <text x="572" y="465" fill="{c['title']}">n=3</text><text x="782" y="465" fill="{c['text']}">6</text>
   </g>
 </svg>'''
 

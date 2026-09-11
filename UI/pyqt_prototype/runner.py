@@ -7,6 +7,7 @@ import Commands.CommandRegistration  # registers all commands
 from API.RangeAPI import getTableBounds, invert, printResults
 from CmdTools import Command
 from Parameters import OutputType, ParamType
+from Restriction import Restriction
 from SequencerAPI import SequencerAPI
 from Statistic import Dimension, DimensionType, Statistic
 
@@ -37,8 +38,11 @@ def format_parameters(values: dict[str, object]) -> str:
             value = "true" if value else "false"
         if isinstance(value, OutputType):
             value = output_token(value)
-        if isinstance(value, list) and all(isinstance(item, Dimension) for item in value):
-            value = ",".join(f"{item.name}-{'parameter' if item.dim_type == DimensionType.PARAMETER else 'computed'}" for item in value)
+        if isinstance(value, list):
+            if all(isinstance(item, Dimension) for item in value):
+                value = ",".join(f"{item.name}-{'parameter' if item.dim_type == DimensionType.PARAMETER else 'computed'}" for item in value)
+            else:
+                value = ",".join(str(item) for item in value)
         parts.append(f"{name}:{value}")
     return "/".join(parts)
 
@@ -52,17 +56,35 @@ def output_token(output_type: OutputType) -> str:
     }[output_type]
 
 
-def instantiate_command(command_name: str, parameters: dict[str, object]):
+def instantiate_command(command_name: str, parameters: dict[str, object], restriction_groups: list[list[tuple[str, dict[str, object]]]] | None = None):
     command_class = Command.commands[command_name]
-    return command_class(format_parameters(parameters))
+    command = command_class(format_parameters(parameters))
+    command.setRestrictions(instantiate_restrictions(restriction_groups))
+    return command
+
+
+def instantiate_restrictions(restriction_groups: list[list[tuple[str, dict[str, object]]]] | None):
+    groups = []
+    for group in restriction_groups or []:
+        parsed_group = []
+        for restriction_name, parameters in group:
+            parsed_group.append(Restriction.parse(restriction_name + _formatted_suffix(parameters)))
+        if parsed_group:
+            groups.append(parsed_group)
+    return groups
+
+
+def _formatted_suffix(parameters: dict[str, object]) -> str:
+    formatted = format_parameters(parameters)
+    return f"/{formatted}" if formatted else ""
 
 
 def execute_point_query(command_name: str, parameters: dict[str, object], statistic_name: str | None = None, print_elements: bool = False) -> str:
     return run_point_query(command_name, parameters, statistic_name, print_elements).text
 
 
-def run_point_query(command_name: str, parameters: dict[str, object], statistic_name: str | None = None, print_elements: bool = False) -> QueryResult:
-    command = instantiate_command(command_name, parameters)
+def run_point_query(command_name: str, parameters: dict[str, object], statistic_name: str | None = None, print_elements: bool = False, restriction_groups: list[list[tuple[str, dict[str, object]]]] | None = None) -> QueryResult:
+    command = instantiate_command(command_name, parameters, restriction_groups)
     api = SequencerAPI.apis["point"](format_parameters({"p": print_elements}))
     api.setCommand(command)
     api.setStatistic(None if statistic_name is None else Statistic.statistics[statistic_name]())
@@ -81,8 +103,9 @@ def run_range_query(
     statistic_name: str | None = None,
     print_elements: bool = False,
     output_type: OutputType = OutputType.ASCII_TABLE,
+    restriction_groups: list[list[tuple[str, dict[str, object]]]] | None = None,
 ) -> QueryResult:
-    command = instantiate_command(command_name, parameters)
+    command = instantiate_command(command_name, parameters, restriction_groups)
     stat = None if statistic_name is None else Statistic.statistics[statistic_name]()
     api = SequencerAPI.apis["range"](format_parameters({"dimensions": dimensions, "p": print_elements, "out": output_type}))
     api.setCommand(command)
@@ -140,13 +163,14 @@ def run_query(
     print_elements: bool = False,
     dimensions: list[Dimension] | None = None,
     output_type: OutputType = OutputType.ASCII_TABLE,
+    restriction_groups: list[list[tuple[str, dict[str, object]]]] | None = None,
 ) -> QueryResult:
     if api_name == "point":
-        return run_point_query(command_name, parameters, statistic_name, print_elements)
+        return run_point_query(command_name, parameters, statistic_name, print_elements, restriction_groups)
     if api_name == "range":
         if not dimensions:
             raise ValueError("Select at least one range dimension.")
-        return run_range_query(command_name, parameters, dimensions, statistic_name, print_elements, output_type)
+        return run_range_query(command_name, parameters, dimensions, statistic_name, print_elements, output_type, restriction_groups)
     raise ValueError(f"Unsupported API: {api_name}")
 
 

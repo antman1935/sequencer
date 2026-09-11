@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QScrollArea,
+    QToolButton,
     QSizePolicy,
     QSpinBox,
     QTabWidget,
@@ -31,6 +32,7 @@ from PySide6.QtWidgets import (
 
 from CmdTools import Command
 from Parameters import OutputType, ParamType
+from Restriction import Restriction
 from SequencerAPI import SequencerAPI
 from Statistic import Dimension, DimensionType, Statistic
 from UI.pyqt_prototype.runner import QueryResult, coerce_value, run_query
@@ -43,7 +45,7 @@ class WorkerSignals(QObject):
 
 
 class QueryWorker(QRunnable):
-    def __init__(self, api_name, command_name, parameters, statistic_name, print_elements, dimensions, output_type):
+    def __init__(self, api_name, command_name, parameters, statistic_name, print_elements, dimensions, output_type, restriction_groups):
         super().__init__()
         self.api_name = api_name
         self.command_name = command_name
@@ -52,6 +54,7 @@ class QueryWorker(QRunnable):
         self.print_elements = print_elements
         self.dimensions = dimensions
         self.output_type = output_type
+        self.restriction_groups = restriction_groups
         self.signals = WorkerSignals()
 
     @Slot()
@@ -65,6 +68,7 @@ class QueryWorker(QRunnable):
                 self.print_elements,
                 self.dimensions,
                 self.output_type,
+                self.restriction_groups,
             )
         except Exception as exc:
             self.signals.failed.emit(str(exc))
@@ -84,14 +88,16 @@ class GeneratedParameterForm(QWidget):
 
     def set_command(self, command_name):
         self.command_name = command_name
+        self.set_parameters(Command.commands[command_name].parameters)
+
+    def set_parameters(self, parameters):
         self.editors = {}
         while self.layout.count():
             item = self.layout.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
 
-        command_class = Command.commands[command_name]
-        for parameter in sorted(command_class.parameters, key=lambda p: not p.required):
+        for parameter in sorted(parameters, key=lambda p: not p.required):
             editor = self._make_editor(parameter)
             self.layout.addWidget(self._make_parameter_row(parameter, editor))
             self.editors[parameter.name] = (parameter, editor)
@@ -160,6 +166,82 @@ class GeneratedParameterForm(QWidget):
         return coerce_value(parameter.param_type, text)
 
 
+class RestrictionRow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(8)
+        self.picker = QComboBox()
+        for key, restriction_class in Restriction.restrictions.items():
+            self.picker.addItem(restriction_class.ui_name, key)
+        self.form = GeneratedParameterForm()
+        self.layout.addWidget(self.picker)
+        self.layout.addWidget(self.form)
+        self.picker.currentIndexChanged.connect(self.refresh_form)
+        self.refresh_form()
+
+    def refresh_form(self):
+        self.form.set_parameters(Restriction.restrictions[self.picker.currentData()].parameters)
+
+    def value(self):
+        return self.picker.currentData(), self.form.values()
+
+
+class RestrictionGroupEditor(QWidget):
+    def __init__(self, number):
+        super().__init__()
+        self.rows = []
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(8)
+        header = QHBoxLayout()
+        title = QLabel(f"Group {number}")
+        title.setObjectName("fieldLabel")
+        self.add_button = QToolButton()
+        self.add_button.setText("+ restriction")
+        self.add_button.clicked.connect(self.add_restriction)
+        header.addWidget(title)
+        header.addStretch(1)
+        header.addWidget(self.add_button)
+        self.layout.addLayout(header)
+        self.rows_layout = QVBoxLayout()
+        self.rows_layout.setSpacing(10)
+        self.layout.addLayout(self.rows_layout)
+
+    def add_restriction(self):
+        row = RestrictionRow()
+        self.rows.append(row)
+        self.rows_layout.addWidget(row)
+
+    def value(self):
+        return [row.value() for row in self.rows]
+
+
+class RestrictionEditor(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.groups = []
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(10)
+        self.groups_layout = QVBoxLayout()
+        self.groups_layout.setSpacing(12)
+        self.layout.addLayout(self.groups_layout)
+        self.add_group_button = QPushButton("Add OR restriction group")
+        self.add_group_button.clicked.connect(self.add_group)
+        self.layout.addWidget(self.add_group_button)
+        self.add_group()
+
+    def add_group(self):
+        group = RestrictionGroupEditor(len(self.groups) + 1)
+        self.groups.append(group)
+        self.groups_layout.addWidget(group)
+
+    def values(self):
+        return [group for group in (group.value() for group in self.groups) if group]
+
+
 class DimensionSelector(QWidget):
     def __init__(self):
         super().__init__()
@@ -221,6 +303,7 @@ class SequencerPrototypeWindow(QMainWindow):
 
         self.print_elements = QCheckBox("Show generated elements")
         self.form = GeneratedParameterForm()
+        self.restrictions = RestrictionEditor()
         self.dimensions = DimensionSelector()
         self.output_tabs = QTabWidget()
         self.text_output = QTextEdit()
@@ -279,10 +362,13 @@ class SequencerPrototypeWindow(QMainWindow):
         command_scroller.setWidgetResizable(True)
         command_scroller.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         command_scroller.setWidget(self.form)
-        command_scroller.setMinimumHeight(190)
+        command_scroller.setMinimumHeight(150)
         layout.addWidget(command_scroller, 1)
 
-        self.dimension_block = self._make_field_block("Range dimensions", self._scroll_widget(self.dimensions, 150))
+        self.restriction_block = self._make_field_block("Restrictions", self._scroll_widget(self.restrictions, 170))
+        layout.addWidget(self.restriction_block)
+
+        self.dimension_block = self._make_field_block("Range dimensions", self._scroll_widget(self.dimensions, 130))
         layout.addWidget(self.dimension_block)
         layout.addWidget(self.print_elements)
         layout.addWidget(self.run_button)
@@ -349,6 +435,7 @@ class SequencerPrototypeWindow(QMainWindow):
     def run_query(self):
         try:
             parameters = self.form.values()
+            restriction_groups = self.restrictions.values()
             dimensions = self.dimensions.values() if self.api_picker.currentData() == "range" else None
         except Exception as exc:
             QMessageBox.warning(self, "Invalid parameters", str(exc))
@@ -366,6 +453,7 @@ class SequencerPrototypeWindow(QMainWindow):
             self.print_elements.isChecked(),
             dimensions,
             self.output_picker.currentData(),
+            restriction_groups,
         )
         worker.signals.finished.connect(self.query_finished)
         worker.signals.failed.connect(self.query_failed)
